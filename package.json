@@ -1,0 +1,33 @@
+{
+  "name": "onwaveapi",
+  "version": "1.0.0",
+  "description": "first api",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc",
+    "dev": "tsx --watch src/server.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OnWave70/OnWaveApi.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/OnWave70/OnWaveApi/issues"
+  },
+  "homepage": "https://github.com/OnWave70/OnWaveApi#readme",
+  "devDependencies": {
+    "@types/node": "^22.1.0",
+    "prisma": "^5.17.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.18.0",
+    "fastify": "^4.28.1"
+  }
+}
