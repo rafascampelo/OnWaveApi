@@ -16,6 +16,8 @@ model Devs {
   lastName String
   email String @unique
   password String
+
+  @@map("devs")
 }
 
 model Users {
@@ -25,10 +27,12 @@ model Users {
   email String @unique
   born  String
   cpf String @unique
-  cellphone String @unique 
+  cellphone String @unique
+
+  @@map("users") 
 } 
 
-model Product{
+model Products{
   id String @id @default(cuid())
   nameProduct String
   weight Float
@@ -36,4 +40,37 @@ model Product{
   amount Int
   buyPrice Float
   seelPrice Float
+  img String?
+  describe String?
+  process ProductsToProcess[]
+
+  @@map("produts")
 }
+
+
+model Process{
+  id String @id @default(cuid())
+  nameProcess String
+  typeId String
+  type ProcessTypes @relation(fields: [typeId], references: [id])  
+  products ProductsToProcess[]
+
+  @@map("process")
+}  
+
+model ProductsToProcess{
+  id String @id @default(cuid())
+  processId String
+  process Process @relation(fields: [processId], references: [id])
+  productsId String
+  products  Products @relation(fields: [productsId], references: [id])
+}
+
+
+model ProcessTypes{
+  id String @id @default(cuid())
+  nameType String  
+  process Process[]
+
+  @@map("processTypes")
+  }
