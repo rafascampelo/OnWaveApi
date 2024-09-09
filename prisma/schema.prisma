@@ -22,6 +22,7 @@ model Devs {
   lastName String
   email String @unique
   password String
+  role String
 
   @@map("devs")
 }
@@ -49,10 +50,9 @@ model Products{
   id String @id @default(cuid())
   userId String
   user Users @relation(fields: [userId], references: [id])
-  nameProduct String
+  name String
   weight Float
   nameWeight String
-  amount Int
   cost Float
   price Float
   img String?
@@ -101,7 +101,7 @@ model ProductsToProcess{
 
 model ProcessTypes{
   id String @id @default(cuid())
-  nameType String  
+  name String  
   process Process[]
 
   @@map("processTypes")
@@ -141,6 +141,10 @@ model Units {
 
   @@map("units")
 }
+
+// model Adress{
+
+// }
 
 model ProcessToServices{
   id String @id @default(cuid())
