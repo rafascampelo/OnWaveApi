@@ -133,7 +133,8 @@ model BarberShop{
 model Units {
   id String @id @default(cuid())
   name String
-  address String
+  addressId String @unique
+  address Address @relation(fields: [addressId], references: [id])
   barbershopId String
   barbershop BarberShop @relation(fields: [barbershopId],references: [id])
   employees Users[]
@@ -142,9 +143,16 @@ model Units {
   @@map("units")
 }
 
-// model Adress{
+model Address{
+  id String @id @default(cuid())
+  cep String
+  neighborhood String
+  road String
+  num Int
+  complement String
+  unit Units?
 
-// }
+}
 
 model ProcessToServices{
   id String @id @default(cuid())
