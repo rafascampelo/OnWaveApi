@@ -16,32 +16,25 @@ datasource db {
 //   OUT
 // } */
 
-model Devs {
-  id String @id @default(cuid())
-  firstName String
-  lastName String
-  email String @unique
-  password String
-  role String
-
-  @@map("devs")
-}
-
 model Users {
   id String @id @default(cuid())
   firstName String
   lastName String
   email String @unique
-  born  String
-  cpf String @unique
-  cellphone String @unique
-  role String
-  unitId String
+  password String
+  born  String @default("0")
+  cpf String @unique @default("0")
+  cellphone String @unique @default("0")
+  role  String
+  unitId String @default("0")
+  adminId String? 
+  admin Users? @relation("UserAdmin",fields: [adminId],references: [id])
   unit Units @relation(fields: [unitId], references: [id])
   products Products[]
   stockMovements StockMovements[]
   services Services[]
   commission Commissions[]
+  members Users[] @relation("UserAdmin")
 
   @@map("users") 
 } 
