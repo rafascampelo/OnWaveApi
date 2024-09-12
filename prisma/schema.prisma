@@ -28,6 +28,8 @@ model Users {
   role  String
   unitId String @default("0")
   adminId String? 
+  barbeshopId String @default("0")
+  babershop Barbershop @relation(fields: [barbeshopId],references: [id])  
   admin Users? @relation("UserAdmin",fields: [adminId],references: [id])
   unit Units @relation(fields: [unitId], references: [id])
   products Products[]
@@ -52,6 +54,8 @@ model Products{
   describe String?
   stock Int @default(0)
   WorkTop String //yes or no
+  barbershopId String
+  barbershop Barbershop @relation(fields: [barbershopId],references: [id])
   movements StockMovements[]
   process ProductsToProcess[]
   services ProductsToServices[]
@@ -67,7 +71,7 @@ model Process{
   categoryId String
   typeId String
   barberShopId String
-  barberShop BarberShop @relation(fields: [barberShopId], references: [id])
+  barberShop Barbershop @relation(fields: [barberShopId], references: [id])
   type ProcessTypes @relation(fields: [typeId], references: [id])  
   category Categories @relation(fields: [categoryId], references: [id])
   products ProductsToProcess[]
@@ -114,13 +118,15 @@ model StockMovements{
   @@map("stockMovements")
 }
 
-model BarberShop{
+model Barbershop{
   id String @id @default(cuid())
   name String
+  members Users[]
   process Process[]
+  products Products[]
   unit Units[]
 
-  @@map("barberShop")
+  @@map("barbershop")
 }
 
 model Units {
@@ -129,7 +135,7 @@ model Units {
   addressId String @unique
   address Address @relation(fields: [addressId], references: [id])
   barbershopId String
-  barbershop BarberShop @relation(fields: [barbershopId],references: [id])
+  barbershop Barbershop @relation(fields: [barbershopId],references: [id])
   employees Users[]
   cashRegister CashRegisters?
 
