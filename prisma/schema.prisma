@@ -17,201 +17,220 @@ datasource db {
 // } */
 
 model Users {
-  id String @id @default(cuid())
-  firstName String
-  lastName String
-  email String @unique
-  password String
-  born  String @default("0")
-  cpf String @unique @default("0")
-  cellphone String @unique @default("0")
-  role  String
-  unitId String @default("0")
-  adminId String? 
-  barbeshopId String @default("0")
-  babershop Barbershop @relation(fields: [barbeshopId],references: [id])  
-  admin Users? @relation("UserAdmin",fields: [adminId],references: [id])
-  unit Units @relation(fields: [unitId], references: [id])
-  products Products[]
+  id             String           @id @default(cuid())
+  firstName      String
+  lastName       String
+  email          String           @unique
+  password       String
+  born           String           @default("0")
+  cpf            String           @unique @default("0")
+  cellphone      String           @unique @default("0")
+  role           String
+  unitId         String           @default("0")
+  adminId        String?
+  barbeshopId    String           @default("0")
+  babershop      Barbershop       @relation(fields: [barbeshopId], references: [id])
+  admin          Users?           @relation("UserAdmin", fields: [adminId], references: [id])
+  unit           Units            @relation(fields: [unitId], references: [id])
+  products       Products[]
   stockMovements StockMovements[]
-  services Services[]
-  commission Commissions[]
-  members Users[] @relation("UserAdmin")
+  services       Services[]
+  commission     Commissions[]
+  members        Users[]          @relation("UserAdmin")
 
-  @@map("users") 
-} 
+  @@map("users")
+}
 
-model Products{
-  id String @id @default(cuid())
-  userId String
-  user Users @relation(fields: [userId], references: [id])
-  name String
-  weight Float
-  nameWeight String
-  cost Float
-  price Float
-  img String?
-  describe String?
-  stock Int @default(0)
-  WorkTop String //yes or no
+model Products {
+  id           String               @id @default(cuid())
+  userId       String
+  user         Users                @relation(fields: [userId], references: [id])
+  name         String
+  weight       Float
+  nameWeight   String
+  cost         Float
+  price        Float
+  img          String?
+  describe     String?
+  WorkTop      String //yes or no
   barbershopId String
-  barbershop Barbershop @relation(fields: [barbershopId],references: [id])
-  movements StockMovements[]
-  process ProductsToProcess[]
-  services ProductsToServices[]
+  barbershop   Barbershop           @relation(fields: [barbershopId], references: [id])
+  stock        Stocks[]
+  movements    StockMovements[]
+  process      ProductsToProcess[]
+  services     ProductsToServices[]
 
   @@map("produts")
 }
 
-model Process{
-  id String @id @default(cuid())
-  name String
-  cost Float?
-  price Float
-  categoryId String
-  typeId String
+model Process {
+  id           String              @id @default(cuid())
+  name         String
+  cost         Float?
+  price        Float
+  categoryId   String
+  typeId       String
   barberShopId String
-  barberShop Barbershop @relation(fields: [barberShopId], references: [id])
-  type ProcessTypes @relation(fields: [typeId], references: [id])  
-  category Categories @relation(fields: [categoryId], references: [id])
-  products ProductsToProcess[]
-  services ProcessToServices[]
+  barberShop   Barbershop          @relation(fields: [barberShopId], references: [id])
+  type         ProcessTypes        @relation(fields: [typeId], references: [id])
+  category     Categories          @relation(fields: [categoryId], references: [id])
+  products     ProductsToProcess[]
+  services     ProcessToServices[]
 
   @@map("process")
-}  
+}
 
 model Categories {
-  id String @id @default(cuid())
-  name String
+  id      String    @id @default(cuid())
+  name    String
   process Process[]
 }
 
-model ProductsToProcess{
-  id String @id @default(cuid())
-  processId String
-  process Process @relation(fields: [processId], references: [id])
+model ProductsToProcess {
+  id         String   @id @default(cuid())
+  processId  String
+  process    Process  @relation(fields: [processId], references: [id])
   productsId String
-  products  Products @relation(fields: [productsId], references: [id])
+  products   Products @relation(fields: [productsId], references: [id])
 
   @@map("productsToProcess")
 }
 
-model ProcessTypes{
-  id String @id @default(cuid())
-  name String  
+model ProcessTypes {
+  id      String    @id @default(cuid())
+  name    String
   process Process[]
 
   @@map("processTypes")
 }
 
-model StockMovements{
-  id String @id @default(cuid())
-  userId String
-  user Users @relation(fields: [userId], references: [id])
+model StockMovements {
+  id        String   @id @default(cuid())
+  userId    String
+  unitId    String
   productId String
-  product  Products @relation(fields: [productId], references: [id])
-  type String
-  quantity Int
-  describe String?
-  date  DateTime @default(now())
+  type      String
+  quantity  Int
+  describe  String?
+  date      DateTime @default(now())
+  user      Users    @relation(fields: [userId], references: [id])
+  product   Products @relation(fields: [productId], references: [id])
+  unit      Units    @relation(fields: [unitId], references: [id])
 
   @@map("stockMovements")
 }
 
-model Barbershop{
-  id String @id @default(cuid())
-  name String
-  members Users[]
-  process Process[]
+model Barbershop {
+  id       String     @id @default(cuid())
+  name     String
+  members  Users[]
+  process  Process[]
   products Products[]
-  unit Units[]
+  unit     Units[]
 
   @@map("barbershop")
 }
 
 model Units {
-  id String @id @default(cuid())
-  name String
-  addressId String @unique
-  address Address @relation(fields: [addressId], references: [id])
-  barbershopId String
-  barbershop Barbershop @relation(fields: [barbershopId],references: [id])
-  employees Users[]
-  cashRegister CashRegisters?
+  id             String           @id @default(cuid())
+  name           String
+  addressId      String           @unique
+  address        Address          @relation(fields: [addressId], references: [id])
+  barbershopId   String
+  barbershop     Barbershop       @relation(fields: [barbershopId], references: [id])
+  employees      Users[]
+  stock          Stocks[]
+  stockMovements StockMovements[]
+  cashRegister   CashRegisters?
 
   @@map("units")
 }
 
-model Address{
-  id String @id @default(cuid())
-  cep String
+model Address {
+  id           String @id @default(cuid())
+  cep          String
   neighborhood String
-  road String
-  num Int
-  complement String
-  unit Units?
-
+  road         String
+  num          Int
+  complement   String
+  unit         Units?
 }
 
-model ProcessToServices{
-  id String @id @default(cuid())
+model Stocks {
+  id        String   @id @default(cuid())
+  amount    Int
+  unitId    String   @unique
+  productId String   @unique
+  unit      Units    @relation(fields: [unitId], references: [id])
+  product   Products @relation(fields: [productId], references: [id])
+}
+
+model ProcessToServices {
+  id         String   @id @default(cuid())
   servicesId String
-  processId String
-  services Services @relation(fields: [servicesId],references: [id])
-  process Process @relation(fields: [processId],references: [id])
+  processId  String
+  services   Services @relation(fields: [servicesId], references: [id])
+  process    Process  @relation(fields: [processId], references: [id])
 
   @@map("processToServices")
 }
 
-model ProductsToServices{
-  id String @id @default(cuid())
+model ProductsToServices {
+  id         String   @id @default(cuid())
   servicesId String
   productsId String
-  services Services @relation(fields: [servicesId], references: [id])
-  products Products @relation(fields: [productsId], references: [id])
-  
+  services   Services @relation(fields: [servicesId], references: [id])
+  products   Products @relation(fields: [productsId], references: [id])
+
   @@map("productsToServices")
 }
 
-model Services{
-  id String @id @default(cuid())
-  userId String
-  price Float
-  date DateTime @default(now())
-  process ProcessToServices[]
-  products ProductsToServices[] 
+model Services {
+  id         String               @id @default(cuid())
+  userId     String
+  price      Float
+  date       DateTime             @default(now())
+  process    ProcessToServices[]
+  products   ProductsToServices[]
   commission Commissions[]
-  user Users @relation(fields: [userId], references: [id])
+  user       Users                @relation(fields: [userId], references: [id])
 
   @@map("services")
 }
 
 model Commissions {
-  id String @id @default(cuid())
-  userId String
+  id        String   @id @default(cuid())
+  userId    String
   serviceId String
-  amount Float
-  date DateTime @default(now())
-  user Users @relation(fields: [userId], references: [id])
-  service Services @relation(fields: [serviceId], references: [id])  
-
+  amount    Float
+  date      DateTime @default(now())
+  user      Users    @relation(fields: [userId], references: [id])
+  service   Services @relation(fields: [serviceId], references: [id])
 }
 
-model CashRegisters{
-  id String @id @default(cuid())
-  unitId String  @unique
-  cash Float
+model CashRegisters {
+  id            String          @id @default(cuid())
+  unitId        String          @unique
+  cash          Float
   cashMovements CashMovements[]
-  unit Units @relation(fields: [unitId], references: [id])
+  unit          Units           @relation(fields: [unitId], references: [id])
 }
 
 model CashMovements {
-  id String @id @default(cuid())
+  id             String        @id @default(cuid())
   cashRegisterId String
-  type String
-  amount Float
-  description String?
+  type           String
+  amount         Float
+  description    String?
+  date           DateTime      @default(now())
+  cashRegister   CashRegisters @relation(fields: [cashRegisterId], references: [id])
+}
+
+model fixedExpenses{
+  id String @id @default(cuid())
+  name String
+  icon String
   date DateTime @default(now())
-  cashRegister CashRegisters @relation(fields: [cashRegisterId],references: [id])
+  price Float
 }
 
