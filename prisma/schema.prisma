@@ -52,7 +52,7 @@ model Products {
   price        Float
   img          String?
   describe     String?
-  WorkTop      String //yes or no
+  workTop      String //yes or no
   barbershopId String
   barbershop   Barbershop           @relation(fields: [barbershopId], references: [id])
   stock        Stocks[]
@@ -226,11 +226,10 @@ model CashMovements {
   cashRegister   CashRegisters @relation(fields: [cashRegisterId], references: [id])
 }
 
-model fixedExpenses{
-  id String @id @default(cuid())
-  name String
-  icon String
-  date DateTime @default(now())
+model fixedExpenses {
+  id    String   @id @default(cuid())
+  name  String
+  icon  String
+  date  DateTime @default(now())
   price Float
 }
-
