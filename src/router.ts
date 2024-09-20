@@ -1,5 +1,16 @@
 import fastify, { FastifyInstance } from "fastify";
 
+// public rotes
+export const publicRotes = async (fastify: FastifyInstance) => {
+  fastify.post("/sigin",(req, reply) => {
+    return reply.code(200).send("usuário logado")
+  })
+
+  fastify.post("/logout",(req, reply) => {
+    return reply.code(200).send("usuário deslogado")
+  })
+}
+
 //rotas dev
 export const devRotes = async (fastify: FastifyInstance) => {
   //cria um dev novo
