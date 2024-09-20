@@ -53,7 +53,7 @@ export const devRotes = async (fastify: FastifyInstance) => {
   });
 
   //mostra todos os barbeiros de uma barbearia
-  fastify.get("/barbershop/:id", (req, reply) => {
+  fastify.get("/barbershop/:id/employees", (req, reply) => {
     return reply.code(200).send("barbeiros encontrados");
   });
 };
@@ -188,23 +188,23 @@ export const productsRotes = async (fastify: FastifyInstance) => {
 };
 
 export const processRotes = async (fastify: FastifyInstance) => {
-  fastify.patch("name", (req, reply) => {
+  fastify.patch("/name", (req, reply) => {
     return reply.code(200).send("editado com sucesso");
   });
 
-  fastify.patch("cost", (req, reply) => {
+  fastify.patch("/cost", (req, reply) => {
     return reply.code(200).send("editado com sucesso");
   });
 
-  fastify.patch("price", (req, reply) => {
+  fastify.patch("/price", (req, reply) => {
     return reply.code(200).send("editado com sucesso");
   });
 
-  fastify.patch("category", (req, reply) => {
+  fastify.patch("/category", (req, reply) => {
     return reply.code(200).send("editado com sucesso");
   });
 
-  fastify.patch("type", (req, reply) => {
+  fastify.patch("/type", (req, reply) => {
     return reply.code(200).send("editado com sucesso");
   });
 };
@@ -257,8 +257,8 @@ export const unitsRotes = async (fastify: FastifyInstance) => {
   });
 
   //registra uma despesa em uma unidade
-  fastify.get("/expenses", (req, reply) => {
-    return reply.code(200).send("despesas cadastrada com sucesso");
+  fastify.post("/expenses", (req, reply) => {
+    return reply.code(201).send("despesas cadastrada com sucesso");
   });
 
   //mostra todos os produtos de uma unidade
