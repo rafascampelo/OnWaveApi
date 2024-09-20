@@ -63,6 +63,82 @@ model Products {
   @@map("produts")
 }
 
+model Barbershop {
+  id       String     @id @default(cuid())
+  name     String
+  members  Users[]
+  process  Process[]
+  products Products[]
+  unit     Units[]
+
+  @@map("barbershop")
+}
+
+model Units {
+  id              String           @id @default(cuid())
+  name            String
+  addressId       String           @unique
+  address         Address          @relation(fields: [addressId], references: [id])
+  barbershopId    String
+  barbershop      Barbershop       @relation(fields: [barbershopId], references: [id])
+  employees       Users[]
+  stock           Stocks[]
+  stockMovements  StockMovements[]
+  cashRegister    CashRegisters?
+  fixedExpenses   FixedExpenses[]
+  monthlyBalances MonthlyBalance[]
+
+  @@map("units")
+}
+
+model CashRegisters {
+  id            String          @id @default(cuid())
+  unitId        String          @unique
+  cash          Float
+  cashMovements CashMovements[]
+  unit          Units           @relation(fields: [unitId], references: [id])
+
+  @@map("cashRegisters")
+}
+
+model CashMovements {
+  id             String        @id @default(cuid())
+  cashRegisterId String
+  type           String
+  amount         Float
+  description    String?
+  date           DateTime      @default(now())
+  cashRegister   CashRegisters @relation(fields: [cashRegisterId], references: [id])
+
+  @@map("cashMovements")
+}
+
+model FixedExpenses {
+  id     String   @id @default(cuid())
+  name   String
+  icon   String
+  date   DateTime @default(now())
+  price  Float
+  unitId String
+  unit   Units    @relation(fields: [unitId], references: [id])
+
+  @@map("fixedExpenses")
+}
+
+model MonthlyBalance {
+  id           String @id @default(cuid())
+  unitId       String
+  unit         Units  @relation(fields: [unitId], references: [id])
+  month        Int
+  year         Int
+  totalRevenue Float
+  fixedCost    Float
+  variableCost Float
+  totalProfit  Float
+
+  @@map("monthly_balance")
+}
+
 model Process {
   id           String              @id @default(cuid())
   name         String
@@ -110,7 +186,7 @@ model StockMovements {
   unitId    String
   productId String
   type      String
-  quantity  Int
+  amount    Int
   describe  String?
   date      DateTime @default(now())
   user      Users    @relation(fields: [userId], references: [id])
@@ -118,32 +194,6 @@ model StockMovements {
   unit      Units    @relation(fields: [unitId], references: [id])
 
   @@map("stockMovements")
-}
-
-model Barbershop {
-  id       String     @id @default(cuid())
-  name     String
-  members  Users[]
-  process  Process[]
-  products Products[]
-  unit     Units[]
-
-  @@map("barbershop")
-}
-
-model Units {
-  id             String           @id @default(cuid())
-  name           String
-  addressId      String           @unique
-  address        Address          @relation(fields: [addressId], references: [id])
-  barbershopId   String
-  barbershop     Barbershop       @relation(fields: [barbershopId], references: [id])
-  employees      Users[]
-  stock          Stocks[]
-  stockMovements StockMovements[]
-  cashRegister   CashRegisters?
-
-  @@map("units")
 }
 
 model Address {
@@ -206,30 +256,4 @@ model Commissions {
   date      DateTime @default(now())
   user      Users    @relation(fields: [userId], references: [id])
   service   Services @relation(fields: [serviceId], references: [id])
-}
-
-model CashRegisters {
-  id            String          @id @default(cuid())
-  unitId        String          @unique
-  cash          Float
-  cashMovements CashMovements[]
-  unit          Units           @relation(fields: [unitId], references: [id])
-}
-
-model CashMovements {
-  id             String        @id @default(cuid())
-  cashRegisterId String
-  type           String
-  amount         Float
-  description    String?
-  date           DateTime      @default(now())
-  cashRegister   CashRegisters @relation(fields: [cashRegisterId], references: [id])
-}
-
-model fixedExpenses {
-  id    String   @id @default(cuid())
-  name  String
-  icon  String
-  date  DateTime @default(now())
-  price Float
 }
