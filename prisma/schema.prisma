@@ -29,6 +29,7 @@ model Users {
   unitId         String           @default("0")
   adminId        String?
   barbeshopId    String           @default("0")
+  firstLogin     Boolean          @default(true)
   babershop      Barbershop       @relation(fields: [barbeshopId], references: [id])
   admin          Users?           @relation("UserAdmin", fields: [adminId], references: [id])
   unit           Units            @relation(fields: [unitId], references: [id])
