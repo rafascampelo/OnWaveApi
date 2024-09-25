@@ -75,6 +75,16 @@ model Barbershop {
   @@map("barbershop")
 }
 
+model Address {
+  id           String @id @default(cuid())
+  cep          String
+  neighborhood String
+  road         String
+  num          Int
+  complement   String?
+  unit         Units?
+}
+
 model Units {
   id              String           @id @default(cuid())
   name            String
@@ -195,16 +205,6 @@ model StockMovements {
   unit      Units    @relation(fields: [unitId], references: [id])
 
   @@map("stockMovements")
-}
-
-model Address {
-  id           String @id @default(cuid())
-  cep          String
-  neighborhood String
-  road         String
-  num          Int
-  complement   String
-  unit         Units?
 }
 
 model Stocks {
