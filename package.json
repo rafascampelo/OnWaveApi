@@ -9,6 +9,9 @@
     "start": "tsc",
     "dev": "tsx --watch src/server.ts"
   },
+  "prisma": {
+    "seed": "tsx src/database/seed.ts"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OnWave70/OnWaveApi.git"
@@ -20,6 +23,7 @@
   },
   "homepage": "https://github.com/OnWave70/OnWaveApi#readme",
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^22.1.0",
     "prisma": "^5.17.0",
     "ts-node": "^10.9.2",
