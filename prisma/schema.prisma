@@ -23,8 +23,8 @@ model Users {
   email          String           @unique
   password       String
   born           String           @default("0")
-  cpf            String           @unique @default("0")
-  cellphone      String           @unique @default("0")
+  cpf            String           @unique @default(cuid())
+  cellphone      String           @unique @default(cuid())
   role           String
   unitId         String           @default("0")
   adminId        String?
