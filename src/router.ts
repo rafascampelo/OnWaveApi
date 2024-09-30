@@ -1,6 +1,8 @@
 import { FastifyInstance } from "fastify";
 import { CreateUser, CreateDev } from "./interfaces/user";
 import { UserServices } from "./services/user";
+import { BarbershopServices } from "./services/barbershop";
+import { CreateBarbershop } from "./interfaces/barbershop";
 
 // public rotes
 export const publicRotes = async (fastify: FastifyInstance) => {
@@ -24,6 +26,8 @@ export const publicRotes = async (fastify: FastifyInstance) => {
 //rotas dev
 export const devRotes = async (fastify: FastifyInstance) => {
    const userServices = new UserServices();
+   const barbershopServices = new BarbershopServices();
+
    //cria um dev novo
    fastify.post<{ Body: CreateDev }>("/", async (req, reply) => {
       const result = await userServices.create(req.body);
@@ -35,9 +39,21 @@ export const devRotes = async (fastify: FastifyInstance) => {
          .send({ message: "usuário criado com sucesso", result });
    });
    //dev cria uma barbearia
-   fastify.post("/createBarbeshop", (req, reply) => {
-      return reply.code(201).send("barbearia criada com sucesso");
-   });
+   fastify.post<{ Body: CreateBarbershop }>(
+      "/createBarbeshop",
+      async (req, reply) => {
+         const result = await barbershopServices.create(req.body.name);
+
+         if (!result)
+            return reply
+               .code(500)
+               .send({ message: "Erro ao criar a barbearia" });
+
+         return reply
+            .code(201)
+            .send({ message: "barbearia criada com sucesso", result });
+      }
+   );
 
    //dev cria uma unidade
    fastify.post("/createUnit", async (req, reply) => {
@@ -67,7 +83,7 @@ export const devRotes = async (fastify: FastifyInstance) => {
          .send({ message: "Usuários encontrados", users: result });
    });
 
-   //mostra um usário pelo id
+   //mostra um usuário pelo id
    fastify.get<{ Params: { id: string } }>("/user/:id", async (req, reply) => {
       const result = await userServices.findUser(req.params.id);
 
@@ -80,6 +96,7 @@ export const devRotes = async (fastify: FastifyInstance) => {
          .send({ message: "usuário encontrado", user: result });
    });
 
+   //mostra usuários pelo nome
    fastify.get<{ Params: { value: string } }>(
       "/user/name/:value",
       async (req, reply) => {
@@ -97,8 +114,15 @@ export const devRotes = async (fastify: FastifyInstance) => {
    );
 
    //mostra todas as barbearias
-   fastify.get("/barbeshop", (req, reply) => {
-      return reply.code(200).send("barbearias encontradas");
+   fastify.get("/barbeshop", async (req, reply) => {
+      const result = await barbershopServices.getAll();
+
+      if (!result)
+         return reply.code(404).send({ message: "Nenhum usuário encontrado" });
+
+      return reply
+         .code(200)
+         .send({ message: "barbearias encontradas", result });
    });
 
    //mostra uma barbearia
