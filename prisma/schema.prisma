@@ -53,7 +53,7 @@ model Products {
   price        Float
   img          String?
   describe     String?
-  workTop      String //yes or no
+  workTop      Boolean //yes or no
   barbershopId String
   barbershop   Barbershop           @relation(fields: [barbershopId], references: [id])
   stock        Stocks[]

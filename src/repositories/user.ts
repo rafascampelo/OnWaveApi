@@ -16,6 +16,17 @@ export class UserRepositoryPrisma implements UserRepository {
       });
    }
 
+   async getByBarbershopId(id: string): Promise<null | User[]> {
+       return await prisma.users.findMany({
+         where:{
+            barbeshopId: id
+         },
+         orderBy:{
+            firstName: "asc"
+         }
+       })
+   }
+
    async getByEmail(data: { email: string }): Promise<null | User> {
       const { email } = data;
 

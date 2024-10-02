@@ -96,7 +96,7 @@ export const devRotes = async (fastify: FastifyInstance) => {
          .send({ message: "usuário encontrado", user: result });
    });
 
-   //mostra usuários pelo nome
+   //procura usuários pelo nome
    fastify.get<{ Params: { value: string } }>(
       "/user/name/:value",
       async (req, reply) => {
@@ -126,9 +126,22 @@ export const devRotes = async (fastify: FastifyInstance) => {
    });
 
    //mostra uma barbearia
-   fastify.get("/barbershop/:id", (req, reply) => {
-      return reply.code(200).send("barbearia encontrada");
+   fastify.get<{Params: {id: string}}>("/barbershop/:id", async(req, reply) => {
+      const result = await barbershopServices.getById(req.params.id);
+
+      if(!result) return reply.code(404).send({message: "Nenhuma barbearia encontrada"})
+
+      return reply.code(200).send({message: "barbearia encontrada", result});
    });
+
+   //procura por uma barbearia de acordo com seu nome
+   fastify.get<{Params:{name:string}}>("/barbershop/find/:name", async (req, reply) => {
+      const result = await barbershopServices.find(req.params.name)
+
+      if(!result) return reply.code(404).send({massage:"Nenhuma barbearia encontrada"})
+
+      return reply.code(200).send({message: "Barbearias encontradas", result})
+   })
 
    //mostra unidades de uma barbearia
    fastify.get("/barbershop/:id/unit/", (req, reply) => {
@@ -141,9 +154,22 @@ export const devRotes = async (fastify: FastifyInstance) => {
    });
 
    //mostra todos os barbeiros de uma barbearia
-   fastify.get("/barbershop/:id/employees", (req, reply) => {
-      return reply.code(200).send("barbeiros encontrados");
+   fastify.get<{Params: {id: string}}>("/barbershop/:id/employees", async(req, reply) => {
+      const result = await barbershopServices.getEmployees(req.params.id)
+
+      if(!result) return reply.code(404).send({message:"Nenhum barbeiro encontrado"})
+
+      return reply.code(200).send({message: "barbeiros encontrados",result});
    });
+
+   //deleta uma barbearia
+   fastify.delete<{Params:{id:string}}>("/barbershop/:id", async (req, reply) => {
+      const result = await barbershopServices.delete(req.params.id)
+
+      if(!result)  return reply.code(500).send({message:"Erro ao tentar deletar barbearia"})
+
+      return reply.code(200).send({message:"Barbearia deletada com sucesso",result})
+   })
 };
 
 //CRUD Usuário

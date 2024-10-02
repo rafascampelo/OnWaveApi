@@ -1,30 +1,38 @@
 import { Barbershop } from "@prisma/client";
 import { BarbershopRepositoryPrisma } from "../repositories/barbershop";
+import { User } from "../interfaces/user";
+import { UserRepositoryPrisma } from "../repositories/user";
 
 export class BarbershopServices {
-   private barbershopReposotory;
+  private barbershopRepository;
+  private userRepository;
 
-   constructor() {
-      this.barbershopReposotory = new BarbershopRepositoryPrisma();
-   }
+  constructor() {
+    this.barbershopRepository = new BarbershopRepositoryPrisma();
+    this.userRepository = new UserRepositoryPrisma();
+  }
 
-   async create(name: string): Promise<null | Barbershop> {
-      return await this.barbershopReposotory.create({ name });
-   }
+  async create(name: string): Promise<null | Barbershop> {
+    return await this.barbershopRepository.create({ name });
+  }
 
-   async getAll(): Promise<null | Barbershop[]> {
-      return await this.barbershopReposotory.getAll();
-   }
+  async getAll(): Promise<null | Barbershop[]> {
+    return await this.barbershopRepository.getAll();
+  }
 
-   async getById(id: string): Promise<null | Barbershop> {
-      return await this.barbershopReposotory.getById(id);
-   }
+  async getById(id: string): Promise<null | Barbershop> {
+    return await this.barbershopRepository.getById(id);
+  }
 
-   async find(name: string): Promise<null | Barbershop[]> {
-      return await this.barbershopReposotory.getByName(name);
-   }
+  async getEmployees(id: string): Promise<null | User[]> {
+    return await this.userRepository.getByBarbershopId(id);
+  }
 
-   async delete(id: string): Promise<null | Barbershop> {
-      return await this.barbershopReposotory.delete(id);
-   }
+  async find(name: string): Promise<null | Barbershop[]> {
+    return await this.barbershopRepository.getByName(name);
+  }
+
+  async delete(id: string): Promise<null | Barbershop> {
+    return await this.barbershopRepository.delete(id);
+  }
 }

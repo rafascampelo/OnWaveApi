@@ -37,6 +37,7 @@ export interface User {
 
 export interface UserRepository {
    create(data: CreateDev): Promise<null | User>;
+   getByBarbershopId(id: string): Promise<null | User[]>;
    getByEmail(data: { email: string }): Promise<null | User>;
    getById(id: string): Promise<null | User>;
    getByName(value: string): Promise<null | User[]>;
