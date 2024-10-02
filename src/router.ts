@@ -27,7 +27,7 @@ export const publicRotes = async (fastify: FastifyInstance) => {
 export const devRotes = async (fastify: FastifyInstance) => {
    const userServices = new UserServices();
    const barbershopServices = new BarbershopServices();
-
+   
    //cria um dev novo
    fastify.post<{ Body: CreateDev }>("/", async (req, reply) => {
       const result = await userServices.create(req.body);

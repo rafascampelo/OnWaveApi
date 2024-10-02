@@ -45,13 +45,21 @@ export class ProductRepositoryPrisma implements ProductRepository{
     }
 
     async update(data: {id: string ,row: string; value: string; }): Promise<null | Product> {
-        
+        const {id} =data
 
         return await prisma.products.update({
             where:{
                 id
             },data:{
 
+            }
+        })
+    }
+
+    async delete(id: string): Promise<null | Product> {
+        return await prisma.products.delete({
+            where:{
+                id
             }
         })
     }
