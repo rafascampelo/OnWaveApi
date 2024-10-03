@@ -3,6 +3,7 @@ import { CreateUser, CreateDev } from "./interfaces/user";
 import { UserServices } from "./services/user";
 import { BarbershopServices } from "./services/barbershop";
 import { CreateBarbershop } from "./interfaces/barbershop";
+import { ProductService } from "./services/product";
 
 // public rotes
 export const publicRotes = async (fastify: FastifyInstance) => {
@@ -303,7 +304,10 @@ export const barbershopRotes = async (fastify: FastifyInstance) => {
 };
 
 export const productsRotes = async (fastify: FastifyInstance) => {
-   fastify.patch("/name", (req, reply) => {
+   const productService = new ProductService()
+   fastify.patch("/name", async (req, reply) => {
+      const result = await productService()
+
       return reply.code(200).send("editado com sucesso");
    });
 
@@ -320,10 +324,6 @@ export const productsRotes = async (fastify: FastifyInstance) => {
    });
 
    fastify.patch("/price", (req, reply) => {
-      return reply.code(200).send("editado com sucesso");
-   });
-
-   fastify.patch("/img", (req, reply) => {
       return reply.code(200).send("editado com sucesso");
    });
 

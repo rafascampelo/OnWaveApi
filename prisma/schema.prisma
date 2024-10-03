@@ -51,7 +51,6 @@ model Products {
   nameWeight   String
   cost         Float
   price        Float
-  img          String?
   describe     String?
   workTop      Boolean //yes or no
   barbershopId String
