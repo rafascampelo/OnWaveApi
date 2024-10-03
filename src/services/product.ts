@@ -1,7 +1,7 @@
 import { CreateProduct, Product } from "../interfaces/product";
 import { ProductRepositoryPrisma } from "../repositories/product";
 
-export class ProductService{
+export class ProductServices{
     private productRepository;
 
     constructor(){

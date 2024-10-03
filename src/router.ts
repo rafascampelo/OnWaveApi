@@ -3,7 +3,12 @@ import { CreateUser, CreateDev } from "./interfaces/user";
 import { UserServices } from "./services/user";
 import { BarbershopServices } from "./services/barbershop";
 import { CreateBarbershop } from "./interfaces/barbershop";
-import { ProductService } from "./services/product";
+import { ProductServices } from "./services/product";
+import { CreateProduct } from "./interfaces/product";
+
+const userServices = new UserServices();
+const barbershopServices = new BarbershopServices();
+const productServices = new ProductServices()
 
 // public rotes
 export const publicRotes = async (fastify: FastifyInstance) => {
@@ -26,8 +31,7 @@ export const publicRotes = async (fastify: FastifyInstance) => {
 
 //rotas dev
 export const devRotes = async (fastify: FastifyInstance) => {
-   const userServices = new UserServices();
-   const barbershopServices = new BarbershopServices();
+   
    
    //cria um dev novo
    fastify.post<{ Body: CreateDev }>("/", async (req, reply) => {
@@ -71,6 +75,15 @@ export const devRotes = async (fastify: FastifyInstance) => {
          .code(201)
          .send({ message: "usuário criado com sucesso", result });
    });
+
+   //cria um produto
+   fastify.post<{Body: CreateProduct}>("/", async (req, reply) => {
+      const result = await productServices.create(req.body)
+      
+      if(!result) return reply.code(500).send({message: "Erro, usuário não criado"})
+
+      return reply.code(201).send({message: "Produco criado com sucesso", result})   
+   })
 
    //mostra todos os usuários
    fastify.get("/", async (req, reply) => {
@@ -175,7 +188,7 @@ export const devRotes = async (fastify: FastifyInstance) => {
 
 //CRUD Usuário
 export const userRotes = async (fastify: FastifyInstance) => {
-   const userServices = new UserServices();
+
    //um usuário cria um novo usuário
    fastify.post("/:id/employees/", (req, reply) => {
       return reply.code(201).send("criado com sucesso");
@@ -304,35 +317,61 @@ export const barbershopRotes = async (fastify: FastifyInstance) => {
 };
 
 export const productsRotes = async (fastify: FastifyInstance) => {
-   const productService = new ProductService()
-   fastify.patch("/name", async (req, reply) => {
-      const result = await productService()
+  
+   fastify.patch<{Body: {id:string,value: string}}>("/name", async (req, reply) => {
+      const result = await productServices.updateName({id: req.body.id, value: req.body.value})
+   
+      if(!result) return reply.code(500).send({message: "Erro, atualização mal sucedida"})
 
-      return reply.code(200).send("editado com sucesso");
+      return reply.code(200).send({message:"editado com sucesso", result});
    });
 
-   fastify.patch("/weight", (req, reply) => {
-      return reply.code(200).send("editado com sucesso");
+   fastify.patch<{Body: {id:string,value: number}}>("/weight", async(req, reply) => {
+      const result = await productServices.updateWeight({id: req.body.id, value: req.body.value})
+
+      if(!result) return reply.code(500).send({message:"Erro, atualização mal sucedida"})
+
+      return reply.code(200).send({message :"editado com sucesso", result});
    });
 
-   fastify.patch("/nameWeight", (req, reply) => {
-      return reply.code(200).send("editado com sucesso");
+   fastify.patch<{Body: {id:string,value: string}}>("/nameWeight", async(req, reply) => {
+      const result = await productServices.updateNameWeight({id: req.body.id, value: req.body.value})
+
+      if(!result) return reply.code(500).send({message:"Erro, atualização mal sucedida"})
+
+      return reply.code(200).send({messaege:"editado com sucesso", result});
    });
 
-   fastify.patch("/cost", (req, reply) => {
-      return reply.code(200).send("editado com sucesso");
+   fastify.patch<{Body: {id:string,value: number}}>("/cost", async(req, reply) => {
+      const result = await productServices.updateCost({id:req.body.id, value: req.body.value})
+
+      if(!result) return reply.code(500).send({message:"Eroo, atualização mal sucedida"})
+
+      return reply.code(200).send({message:"editado com sucesso", result});
    });
 
-   fastify.patch("/price", (req, reply) => {
-      return reply.code(200).send("editado com sucesso");
+   fastify.patch<{Body: {id:string,value: number}}>("/price", async(req, reply) => {
+      const result = await productServices.updatePrice({id: req.body.id, value: req.body.value})
+
+      if(!result) return reply.code(500).send({message:"Erro, atualização mal sucedida"})
+
+      return reply.code(200).send({message:"editado com sucesso",result});
    });
 
-   fastify.patch("/describe", (req, reply) => {
-      return reply.code(200).send("editado com sucesso");
+   fastify.patch<{Body: {id:string,value: string}}>("/describe", async(req, reply) => {
+      const result = await productServices.updateDescribe({id: req.body.id, value: req.body.value})
+
+      if(!result) return reply.code(500).send({message:"Erro, atualização mal sucedida"})
+
+      return reply.code(200).send({message:"editado com sucesso",result});
    });
 
-   fastify.patch("/workTop", (req, reply) => {
-      return reply.code(200).send("editado com sucesso");
+   fastify.patch<{Body: {id:string,value: boolean}}>("/workTop", async(req, reply) => {
+      const result = await productServices.updateWorktop({id: req.body.id, value: req.body.value})
+
+      if(!result) return reply.code(500).send({message: "Erro, atualização mal sucedida"})
+
+      return reply.code(200).send({message:"editado com sucesso", result});
    });
 };
 
