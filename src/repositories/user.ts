@@ -1,103 +1,144 @@
 import { prisma } from "../database/prisma-client";
-import { CreateDev, UserRepository, User } from "../interfaces/user";
+import {
+  CreateDev,
+  UserRepository,
+  User,
+  CreateUser,
+} from "../interfaces/user";
 
 export class UserRepositoryPrisma implements UserRepository {
-   async create(data: CreateDev): Promise<null | User> {
-      const { firstName, lastName, email, password } = data;
+  async createUser(data: CreateUser): Promise<null | User> {
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      barbeshopId,
+      born,
+      cellphone,
+      cpf,
+      role,
+      unitId,
+      adminId,
+    } = data;
 
-      return await prisma.users.create({
-         data: {
-            firstName,
-            lastName,
-            email,
-            password,
-            role: "DEV",
-         },
-      });
-   }
+    return await prisma.users.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        password,
+        role,
+        barbeshopId,
+        born,
+        cellphone,
+        cpf,
+        unitId,
+        adminId,
+      },
+    });
+  }
 
-   async getByBarbershopId(id: string): Promise<null | User[]> {
-       return await prisma.users.findMany({
-         where:{
-            barbeshopId: id
-         },
-         orderBy:{
-            firstName: "asc"
-         }
-       })
-   }
+  async createDev(data: CreateDev): Promise<null | User> {
+    const { firstName, lastName, email, password } = data;
 
-   async getByEmail(data: { email: string }): Promise<null | User> {
-      const { email } = data;
+    return await prisma.users.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        password,
+        role: "DEV",
+      },
+    });
+  }
 
-      return await prisma.users.findUnique({
-         where: {
-            email,
-         },
-      });
-   }
+  async getByBarbershopId(id: string): Promise<null | User[]> {
+    return await prisma.users.findMany({
+      where: {
+        barbeshopId: id,
+      },
+      orderBy: {
+        firstName: "asc",
+      },
+    });
+  }
 
-   async getById(id: string): Promise<null | User> {
-      return await prisma.users.findUnique({
-         where: {
-            id,
-         },
-      });
-   }
+  async getByEmail(email: string): Promise<null | User> {
+    return await prisma.users.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
 
-   async getByName(value: string): Promise<null | User[]> {
-      return await prisma.users.findMany({
-         where: {
-            OR: [
-               { firstName: { contains: value } },
-               { lastName: { contains: value } },
-            ],
-         },
-         orderBy: {
-            firstName: "asc",
-         },
-      });
-   }
+  async getById(id: string): Promise<null | User> {
+    return await prisma.users.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
 
-   async getUsers(): Promise<null | User[]> {
-      return await prisma.users.findMany();
-   }
+  async getByName(value: string): Promise<null | User[]> {
+    return await prisma.users.findMany({
+      where: {
+        OR: [
+          { firstName: { contains: value } },
+          { lastName: { contains: value } },
+        ],
+      },
+      orderBy: {
+        firstName: "asc",
+      },
+    });
+  }
 
-   async updateCellphone(data: {
-      id: string;
-      value: string;
-   }): Promise<null | User> {
-      const { id, value } = data;
+  async getEmployess(id: string): Promise<null | User[]> {
+    return await prisma.users.findMany({
+      where: { adminId: id },
+    });
+  }
 
-      return await prisma.users.update({
-         where: { id },
-         data: {
-            cellphone: value,
-         },
-      });
-   }
+  async getUsers(): Promise<null | User[]> {
+    return await prisma.users.findMany();
+  }
 
-   async updatePassword(data: {
-      id: string;
-      value: string;
-   }): Promise<null | User> {
-      const { id, value } = data;
+  async updateCellphone(data: {
+    id: string;
+    value: string;
+  }): Promise<null | User> {
+    const { id, value } = data;
 
-      return await prisma.users.update({
-         where: {
-            id,
-         },
-         data: {
-            password: value,
-         },
-      });
-   }
+    return await prisma.users.update({
+      where: { id },
+      data: {
+        cellphone: value,
+      },
+    });
+  }
 
-   async delete(id: string): Promise<null | User> {
-      return await prisma.users.delete({
-         where: {
-            id,
-         },
-      });
-   }
+  async updatePassword(data: {
+    id: string;
+    value: string;
+  }): Promise<null | User> {
+    const { id, value } = data;
+
+    return await prisma.users.update({
+      where: {
+        id,
+      },
+      data: {
+        password: value,
+      },
+    });
+  }
+
+  async delete(id: string): Promise<null | User> {
+    return await prisma.users.delete({
+      where: {
+        id,
+      },
+    });
+  }
 }
