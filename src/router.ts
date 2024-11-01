@@ -19,7 +19,7 @@ const productServices = new ProductServices();
 
 // public rotes
 export const publicRotes = async (fastify: FastifyInstance) => {
-  fastify.post<{ Body: Login }>("/sigin", async (req, reply) => {
+  fastify.post<{ Body: Login }>("/signin", async (req, reply) => {
     console.log(req.body);
     const result = await userServices.sigin(req.body);
 
