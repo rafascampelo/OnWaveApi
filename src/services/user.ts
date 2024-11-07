@@ -15,17 +15,29 @@ export class UserServices {
   async sigin(
     data: Login
   ): Promise<null | { message: string; user?: User; token?: string }> {
+    console.log(data.email);
+    console.log(data.password);
     const user = await this.userRepository.getByEmail(data.email);
 
-    if (!user) return null;
+    console.log(user);
+
+    if (!user) {
+      console.log("oi");
+      return null;
+    }
 
     const match = await compare(data.password, user.password);
 
-    if (!match) return { message: "senha incorreta" };
+    if (!match) {
+      console.log("senha errada");
+      return { message: "senha incorreta" };
+    }
 
     const token = jwt.sign({ id: user.id }, auth.secret, {
       expiresIn: 86400,
     });
+
+    console.log("logado");
 
     return { message: "Usuário logado", user, token };
   }

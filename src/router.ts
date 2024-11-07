@@ -20,8 +20,10 @@ const productServices = new ProductServices();
 // public rotes
 export const publicRotes = async (fastify: FastifyInstance) => {
   fastify.post<{ Body: Login }>("/signin", async (req, reply) => {
-    console.log(req.body);
-    const result = await userServices.sigin(req.body);
+    const result = await userServices.sigin({
+      email: req.body.email,
+      password: req.body.password,
+    });
 
     if (!result)
       return reply.code(400).send({ error: "usuário não encontrado" });
