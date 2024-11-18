@@ -80,9 +80,9 @@ export class UserServices {
       role,
       adminId,
       barbershopId,
-      commissionProcedure,
-      commissionProduct,
-      fixedPayment,
+      commissionProcedure: Number(commissionProcedure),
+      commissionProduct: Number(commissionProduct),
+      fixedPayment: Number(fixedPayment),
       firstLogin,
     });
 
@@ -92,6 +92,7 @@ export class UserServices {
   async getAllUsers(): Promise<null | User[]> {
     return await this.userRepository.getUsers();
   }
+
   async findUser(id: string): Promise<null | User> {
     return await this.userRepository.getById(id);
   }
@@ -102,6 +103,53 @@ export class UserServices {
 
   async findUsersByName(value: string): Promise<null | User[]> {
     return await this.userRepository.getByName(value);
+  }
+
+  async updateFixedPayment(data: {
+    id: string;
+    employeeId: string;
+    value: number;
+  }): Promise<null | User> {
+    const { employeeId, id, value } = data;
+    const user = await this.findUser(employeeId);
+    if (user?.adminId !== id) return null;
+
+    return await this.userRepository.updateFixedPayment({
+      id: employeeId,
+      value: Number(value),
+    });
+  }
+
+  async updateCommissionProcedure(data: {
+    id: string;
+    employeeId: string;
+    value: number;
+  }): Promise<null | User> {
+    const { employeeId, id, value } = data;
+    const user = await this.findUser(employeeId);
+
+    if (user?.adminId !== id) return null;
+
+    return await this.userRepository.updateCommissionProcedure({
+      id: employeeId,
+      value: Number(value),
+    });
+  }
+
+  async updateCommissionProduct(data: {
+    id: string;
+    employeeId: string;
+    value: number;
+  }): Promise<null | User> {
+    const { employeeId, id, value } = data;
+    const user = await this.findUser(employeeId);
+
+    if (user?.adminId !== id) return null;
+
+    return await this.userRepository.updateCommissionProduct({
+      id: employeeId,
+      value: Number(value),
+    });
   }
 
   async updateCellphone(data: {

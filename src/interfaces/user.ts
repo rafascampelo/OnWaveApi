@@ -42,6 +42,15 @@ export interface UserRepository {
   getByName(value: string): Promise<null | User[]>;
   getUsers(): Promise<null | User[]>;
   updateCellphone(data: { id: string; value: string }): Promise<null | User>;
+  updateFixedPayment(data: { id: string; value: number }): Promise<null | User>;
+  updateCommissionProduct(data: {
+    id: string;
+    value: number;
+  }): Promise<null | User>;
+  updateCommissionProcedure(data: {
+    id: string;
+    value: number;
+  }): Promise<null | User>;
   updatePassword(data: { id: string; value: string }): Promise<null | User>;
   delete(id: string): Promise<null | User>;
 }

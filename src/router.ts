@@ -102,7 +102,6 @@ export const devRotes = async (fastify: FastifyInstance) => {
     if (!result)
       return reply.code(404).send({ message: "Usuário não encontrado" });
 
-    console.log(result);
     return reply
       .code(200)
       .send({ message: "usuário encontrado", user: result });
@@ -211,6 +210,18 @@ export const userRotes = async (fastify: FastifyInstance) => {
       .send({ message: "usuário criado com sucesso", result });
   });
 
+  //retorna o próprio user
+  fastify.get<{ Params: { id: string } }>("/:id", async (req, reply) => {
+    const result = await userServices.findUser(req.params.id);
+
+    if (!result)
+      return reply.code(404).send({ message: "Usuário não encontrado" });
+
+    return reply
+      .code(200)
+      .send({ message: "usuário encontrado", user: result });
+  });
+
   //retorna todos os funcionarios daquele barbeiro
   fastify.get<{ Params: { id: string } }>(
     "/:id/employees/",
@@ -232,6 +243,71 @@ export const userRotes = async (fastify: FastifyInstance) => {
   //retorna comissão do usuário
   fastify.get("/:id/commission", (req, reply) => {
     return reply.code(200).send("comissão encontrada");
+  });
+
+  //edita pagamento fixo
+  fastify.patch<{
+    Body: { value: number };
+    Params: { id: string; employeeId: string };
+  }>("/:id/employees/:employeeId/fixedPayment", async (req, reply) => {
+    const data = {
+      id: req.params.id,
+      employeeId: req.params.employeeId,
+      value: req.body.value,
+    };
+    const result = await userServices.updateFixedPayment(data);
+
+    if (!result)
+      return reply
+        .code(400)
+        .send({ message: "Falha ao alterar pagamento fixo" });
+
+    return reply.code(200).send({
+      message: "Pagamento fixo alterado com sucesso",
+      user: result,
+    });
+  });
+
+  //edita comissão por produto
+  fastify.patch<{
+    Body: { value: number };
+    Params: { id: string; employeeId: string };
+  }>("/:id/employees/:employeeId/commissionProduct", async (req, reply) => {
+    const data = {
+      id: req.params.id,
+      employeeId: req.params.employeeId,
+      value: req.body.value,
+    };
+    const result = await userServices.updateCommissionProduct(data);
+
+    if (!result)
+      return reply.code(500).send({ message: "Falha ao alterar Comissão" });
+
+    return reply.code(200).send({
+      message: "Comissão alterado com sucesso",
+      user: result,
+    });
+  });
+
+  //edita comissão por procedimento
+  fastify.patch<{
+    Body: { value: number };
+    Params: { id: string; employeeId: string };
+  }>("/:id/employees/:employeeId/commissionProcedure", async (req, reply) => {
+    const data = {
+      id: req.params.id,
+      employeeId: req.params.employeeId,
+      value: req.body.value,
+    };
+    const result = await userServices.updateCommissionProcedure(data);
+
+    if (!result)
+      return reply.code(500).send({ message: "Falha ao alterar Comissão" });
+
+    return reply.code(200).send({
+      message: "Comissão alterado com sucesso",
+      user: result,
+    });
   });
 
   //edita celular do usuário
@@ -285,7 +361,7 @@ export const userRotes = async (fastify: FastifyInstance) => {
 
   //um usuário deleta outro usuário
   fastify.delete<{ Params: { id: string; employeeId: string } }>(
-    "/:id/employee/:employeeId",
+    "/:id/employees/:employeeId",
     async (req, reply) => {
       const result = await userServices.deleteEmployee({
         userId: req.params.id,
