@@ -1,22 +1,16 @@
 export interface CreateUser {
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   email: string;
-  password: string;
-  born: string;
-  cpf: string;
+  password?: string;
   cellphone: string;
   role: string;
-  unitId: string;
+  fixedPayment?: number;
+  commissionProduct?: number;
+  commissionProcedure?: number;
+  firstLogin?: boolean;
   adminId?: string;
-  barbeshopId: string;
-}
-
-export interface CreateDev {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
+  barbershopId?: string;
 }
 
 export interface Login {
@@ -26,22 +20,21 @@ export interface Login {
 
 export interface User {
   id: string;
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   email: string;
   password: string;
-  born: string;
-  cpf: string;
   cellphone: string;
   role: string;
-  unitId: string;
+  fixedPayment: number | null;
+  commissionProduct: number | null;
+  commissionProcedure: number | null;
   adminId: string | null;
-  barbeshopId: string;
+  barbershopId: string | null;
   firstLogin: boolean;
 }
 
 export interface UserRepository {
-  createDev(data: CreateDev): Promise<null | User>;
   createUser(data: CreateUser): Promise<null | User>;
   getByBarbershopId(id: string): Promise<null | User[]>;
   getByEmail(email: string): Promise<null | User>;

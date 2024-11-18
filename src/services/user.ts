@@ -1,5 +1,5 @@
 import { compare, hash } from "bcrypt";
-import { CreateDev, CreateUser, Login, User } from "../interfaces/user";
+import { CreateUser, Login, User } from "../interfaces/user";
 import { UserRepositoryPrisma } from "../repositories/user";
 import { randomInt } from "crypto";
 import jwt from "jsonwebtoken";
@@ -52,50 +52,43 @@ export class UserServices {
     return false;
   }
 
-  async createEmployee(data: CreateUser): Promise<null | User> {
+  async create(data: CreateUser): Promise<null | User> {
     const {
-      firstName,
-      lastName,
+      firstname,
+      lastname,
       email,
       password,
-      barbeshopId,
-      born,
       cellphone,
-      cpf,
       role,
-      unitId,
       adminId,
+      barbershopId,
+      commissionProcedure,
+      commissionProduct,
+      fixedPayment,
     } = data;
-    const hashPassword = await hash(password, randomInt(10, 16));
+
+    let Vpassword = !password ? "0000" : password;
+    const firstLogin = password ? false : true;
+
+    const hashPassword = await hash(Vpassword, randomInt(10, 16));
     const result = await this.userRepository.createUser({
-      firstName,
-      lastName,
+      firstname,
+      lastname,
       email,
       password: hashPassword,
-      barbeshopId,
-      born,
       cellphone,
-      cpf,
       role,
-      unitId,
       adminId,
+      barbershopId,
+      commissionProcedure,
+      commissionProduct,
+      fixedPayment,
+      firstLogin,
     });
 
     return result;
   }
 
-  async create(data: CreateDev): Promise<null | User> {
-    const { firstName, lastName, email, password } = data;
-    const hashPassword = await hash(password, randomInt(10, 16));
-    const result = await this.userRepository.createDev({
-      firstName,
-      lastName,
-      email,
-      password: hashPassword,
-    });
-
-    return result;
-  }
   async getAllUsers(): Promise<null | User[]> {
     return await this.userRepository.getUsers();
   }

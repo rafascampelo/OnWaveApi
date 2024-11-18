@@ -22,18 +22,16 @@ model Users {
   lastname String
   email String @unique
   password String
-  born String
-  cpf String @unique
   cellphone String @unique
   role String
   fixedPayment Float?
-  comissionProduct Float?
-  comissionProcedure Float?
+  commissionProduct Float?
+  commissionProcedure Float?
   firstLogin Boolean @default(true)
   adminId String?
-  barbershopId String
+  barbershopId String?
   admin Users? @relation("UserAdmin", fields: [adminId], references: [id])
-  barbershop Barbershops @relation(fields: [barbershopId], references: [id])
+  barbershop Barbershops? @relation(fields: [barbershopId], references: [id])
   members Users[] @relation("UserAdmin")
   services Services[]
   serviceCommissions ServiceCommissions[]

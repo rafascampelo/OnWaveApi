@@ -1,7 +1,7 @@
-import { Barbershop } from "@prisma/client";
 import { BarbershopRepositoryPrisma } from "../repositories/barbershop";
 import { User } from "../interfaces/user";
 import { UserRepositoryPrisma } from "../repositories/user";
+import { Barbershop, CreateBarbershop } from "../interfaces/barbershop";
 
 export class BarbershopServices {
   private barbershopRepository;
@@ -12,8 +12,8 @@ export class BarbershopServices {
     this.userRepository = new UserRepositoryPrisma();
   }
 
-  async create(name: string): Promise<null | Barbershop> {
-    return await this.barbershopRepository.create({ name });
+  async create(data: CreateBarbershop): Promise<null | Barbershop> {
+    return await this.barbershopRepository.create(data);
   }
 
   async getAll(): Promise<null | Barbershop[]> {

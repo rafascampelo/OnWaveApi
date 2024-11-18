@@ -1,54 +1,39 @@
 import { prisma } from "../database/prisma-client";
-import {
-  CreateDev,
-  UserRepository,
-  User,
-  CreateUser,
-} from "../interfaces/user";
+import { UserRepository, User, CreateUser } from "../interfaces/user";
 
 export class UserRepositoryPrisma implements UserRepository {
   async createUser(data: CreateUser): Promise<null | User> {
     const {
-      firstName,
-      lastName,
+      firstname,
+      lastname,
       email,
       password,
-      barbeshopId,
-      born,
+      barbershopId,
       cellphone,
-      cpf,
       role,
-      unitId,
+      fixedPayment,
+      commissionProcedure,
+      commissionProduct,
       adminId,
+      firstLogin,
     } = data;
 
+    if (!password) return null;
+
     return await prisma.users.create({
       data: {
-        firstName,
-        lastName,
+        firstname,
+        lastname,
         email,
         password,
-        role,
-        barbeshopId,
-        born,
         cellphone,
-        cpf,
-        unitId,
+        role,
+        fixedPayment,
+        commissionProcedure,
+        commissionProduct,
         adminId,
-      },
-    });
-  }
-
-  async createDev(data: CreateDev): Promise<null | User> {
-    const { firstName, lastName, email, password } = data;
-
-    return await prisma.users.create({
-      data: {
-        firstName,
-        lastName,
-        email,
-        password,
-        role: "DEV",
+        barbershopId,
+        firstLogin,
       },
     });
   }
@@ -56,10 +41,10 @@ export class UserRepositoryPrisma implements UserRepository {
   async getByBarbershopId(id: string): Promise<null | User[]> {
     return await prisma.users.findMany({
       where: {
-        barbeshopId: id,
+        barbershopId: id,
       },
       orderBy: {
-        firstName: "asc",
+        firstname: "asc",
       },
     });
   }
@@ -84,12 +69,12 @@ export class UserRepositoryPrisma implements UserRepository {
     return await prisma.users.findMany({
       where: {
         OR: [
-          { firstName: { contains: value } },
-          { lastName: { contains: value } },
+          { firstname: { contains: value } },
+          { lastname: { contains: value } },
         ],
       },
       orderBy: {
-        firstName: "asc",
+        firstname: "asc",
       },
     });
   }
