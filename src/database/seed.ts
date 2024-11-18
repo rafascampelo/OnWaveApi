@@ -1,29 +1,19 @@
 import { prisma } from "./prisma-client";
 
 const seed = async () => {
-  await prisma.barbershop.create({
+
+  const address = await prisma.addresses.create({
     data: {
-      id: "0",
-      name: "0",
+      cep: "08557-000",
+      address: "Av. Vital Brasil, 827 - Vila Acoreana, Poá - SP",
     },
   });
 
-  await prisma.address.create({
-    data: {
-      id: "0",
-      cep: "0",
-      neighborhood: "0",
-      road: "0",
-      num: 0,
-    },
-  });
 
-  await prisma.units.create({
+  await prisma.barbershops.create({
     data: {
-      id: "0",
-      name: "0",
-      addressId: "0",
-      barbershopId: "0",
+      name: "Barbearia da Etec",
+      addressId: address.id, 
     },
   });
 

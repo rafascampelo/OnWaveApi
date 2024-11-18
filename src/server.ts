@@ -79,5 +79,5 @@ server.listen({ port: 3080, host: "localhost" }, (err, address) => {
     process.exit(1);
   }
 
-  // console.log(`Ouvindo na porta ${address}`);
+  console.log(`Ouvindo na porta ${address}`);
 });

@@ -17,29 +17,30 @@ export class UserServices {
   ): Promise<null | { message: string; user?: User; token?: string }> {
     console.log(data.email);
     console.log(data.password);
-    const user = await this.userRepository.getByEmail(data.email);
+    const nuser = await this.userRepository.getByEmail(data.email);
 
-    console.log(user);
+    console.log(nuser);
 
-    if (!user) {
+    if (!nuser) {
       console.log("oi");
       return null;
     }
 
-    const match = await compare(data.password, user.password);
+    const match = await compare(data.password, nuser.password);
 
     if (!match) {
       console.log("senha errada");
       return { message: "senha incorreta" };
     }
 
-    const token = jwt.sign({ id: user.id }, auth.secret, {
+    const token = jwt.sign({ id: nuser.id }, auth.secret, {
       expiresIn: 86400,
     });
 
+    const user = { ...nuser, token };
     console.log("logado");
 
-    return { message: "Usuário logado", user, token };
+    return { message: "Usuário logado", user };
   }
 
   logout(token: string): boolean {
