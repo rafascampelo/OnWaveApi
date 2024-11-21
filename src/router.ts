@@ -4,8 +4,10 @@ import { UserServices } from "./services/user";
 import { BarbershopServices } from "./services/barbershop";
 import { CreateBarbershop } from "./interfaces/barbershop";
 import { ProductServices } from "./services/product";
-import { CreateProduct } from "./interfaces/product";
+import { CreateProduct, CreateProductPrisma } from "./interfaces/product";
 import { AuthMiddleware } from "./middleware/middleware";
+import { CategoryServices } from "./services/category";
+import { CreateCategory, CreateCategoryPrisma } from "./interfaces/category";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -16,6 +18,7 @@ declare module "fastify" {
 const userServices = new UserServices();
 const barbershopServices = new BarbershopServices();
 const productServices = new ProductServices();
+const categoryServices = new CategoryServices();
 
 // public rotes
 export const publicRotes = async (fastify: FastifyInstance) => {
@@ -69,19 +72,27 @@ export const devRotes = async (fastify: FastifyInstance) => {
   });
 
   //cria um produto
-  fastify.post<{ Body: CreateProduct }>(
-    "/createProduct",
-    async (req, reply) => {
-      const result = await productServices.create(req.body);
+  fastify.post<{
+    Body: CreateProduct;
+    Params: { barbershopId: string };
+  }>("/createProduct", async (req, reply) => {
+    const data: CreateProductPrisma = {
+      name: req.body.name,
+      weight: req.body.weight,
+      nameWeight: req.body.nameWeight,
+      cost: req.body.cost,
+      price: req.body.price,
+      stock: req.body.stock,
+      workTop: req.body.workTop,
+      categoryId: req.body.categoryId,
+      barbershopId: req.params.barbershopId,
+    };
+    const result = await productServices.create(data);
 
-      if (!result)
-        return reply.code(500).send({ message: "Erro, usuário não criado" });
+    if (!result) return reply.code(500).send("Erro ao criar produto");
 
-      return reply
-        .code(201)
-        .send({ message: "Produco criado com sucesso", result });
-    }
-  );
+    return reply.code(201).send("produto criado com sucesso");
+  });
 
   //mostra todos os usuários
   fastify.get("/", async (req, reply) => {
@@ -380,8 +391,28 @@ export const userRotes = async (fastify: FastifyInstance) => {
 
 export const barbershopRotes = async (fastify: FastifyInstance) => {
   // cria produtos da barbearia
-  fastify.post("/createProducts", (req, reply) => {
-    return reply.code(201).send("produto criado com sucesso");
+  fastify.post<{
+    Body: CreateProduct;
+    Params: { userId: string; barbershopId: string };
+  }>("/createProduct", async (req, reply) => {
+    const data: CreateProductPrisma = {
+      name: req.body.name,
+      weight: req.body.weight,
+      nameWeight: req.body.nameWeight,
+      cost: req.body.cost,
+      price: req.body.price,
+      stock: req.body.stock,
+      workTop: req.body.workTop,
+      categoryId: req.body.categoryId,
+      barbershopId: req.params.barbershopId,
+    };
+    const result = await productServices.create(data);
+
+    if (!result) return reply.code(500).send("Erro ao criar produto");
+
+    return reply
+      .code(201)
+      .send({ message: "produto criado com sucesso", result });
   });
 
   //cria um procedimento
@@ -389,15 +420,70 @@ export const barbershopRotes = async (fastify: FastifyInstance) => {
     return reply.code(201).send("procedimento cridado com sucesso");
   });
 
-  //mostra todos os produtos
-  fastify.get("/products", (req, reply) => {
-    return reply.code(200).send("produtos encontrados");
+  //cria uma categoria
+  fastify.post<{
+    Body: CreateCategory;
+    Params: { userId: string; barbershopId: string };
+  }>("/createCategory", async (req, reply) => {
+    const data: CreateCategoryPrisma = {
+      name: req.body.name,
+      barbershopId: req.params.barbershopId,
+    };
+    const result = await categoryServices.create(data);
+
+    if (!result) return reply.code(500).send("Erro ao criar categoria");
+
+    return reply
+      .code(201)
+      .send({ message: "categoria criada com sucesso", result });
   });
 
+  //mostra todos os produtos
+  fastify.get<{ Params: { userId: string; barbershopId: string } }>(
+    "/products",
+    async (req, reply) => {
+      const result = await productServices.getAll(req.params.barbershopId);
+
+      return reply.code(200).send({ message: "produtos encontrados", result });
+    }
+  );
+
   //mostra um produto
-  fastify.get("/products/:produtctId", (req, reply) => {
-    return reply.code(200).send("produto encontrado");
+  fastify.get<{
+    Params: { userId: string; barbershopId: string; productId: string };
+  }>("/products/:productId", async (req, reply) => {
+    const result = await productServices.getById(req.params.productId);
+
+    if (!result) return reply.code(404).send("nenhum produto encontrado");
+    return reply.code(200).send({ message: "produto encontrado", result });
   });
+
+  //mostra todas categorias
+  fastify.get<{ Params: { userId: string; barbershopId: string } }>(
+    "/categories",
+    async (req, reply) => {
+      const result = await categoryServices.getAll({
+        barbershopId: req.params.barbershopId,
+      });
+
+      if (!result) return reply.code(500).send("Erro");
+
+      return reply
+        .code(200)
+        .send({ message: "Categorias encontradas", result });
+    }
+  );
+
+  //mostra uma categoria
+    fastify.get<{
+      Params: { userId: string; barbershopId: string; categoryId: string };
+    }>("/categories/:categoryId", async (req, reply) => {
+      const result = await categoryServices.getById(req.params.categoryId);
+
+      if (!result) return reply.code(404).send("nenhum produto encontrado");
+      return reply.code(200).send({ message: "produto encontrado", result });
+    });
+
 
   //mostra todos os procedimentos
   fastify.get("/process", (req, reply) => {
@@ -416,107 +502,134 @@ export const barbershopRotes = async (fastify: FastifyInstance) => {
 };
 
 export const productsRotes = async (fastify: FastifyInstance) => {
-  fastify.patch<{ Body: { id: string; value: string } }>(
-    "/name",
-    async (req, reply) => {
-      const result = await productServices.updateName({
-        id: req.body.id,
-        value: req.body.value,
-      });
+  fastify.patch<{
+    Body: { value: string };
+    Params: { userId: string; barbershopId: string; productId: string };
+  }>("/name", async (req, reply) => {
+    const result = await productServices.updateName({
+      id: req.params.productId,
+      value: req.body.value,
+    });
 
-      if (!result)
-        return reply
-          .code(500)
-          .send({ message: "Erro, atualização mal sucedida" });
+    if (!result)
+      return reply
+        .code(500)
+        .send({ message: "Erro, atualização mal sucedida" });
 
-      return reply.code(200).send({ message: "editado com sucesso", result });
-    }
-  );
+    return reply.code(200).send({ message: "editado com sucesso", result });
+  });
 
-  fastify.patch<{ Body: { id: string; value: number } }>(
-    "/weight",
-    async (req, reply) => {
-      const result = await productServices.updateWeight({
-        id: req.body.id,
-        value: req.body.value,
-      });
+  fastify.patch<{
+    Body: { value: number };
+    Params: { userId: string; barbershopId: string; productId: string };
+  }>("/weight", async (req, reply) => {
+    const result = await productServices.updateWeight({
+      id: req.params.productId,
+      value: req.body.value,
+    });
 
-      if (!result)
-        return reply
-          .code(500)
-          .send({ message: "Erro, atualização mal sucedida" });
+    if (!result)
+      return reply
+        .code(500)
+        .send({ message: "Erro, atualização mal sucedida" });
 
-      return reply.code(200).send({ message: "editado com sucesso", result });
-    }
-  );
+    return reply.code(200).send({ message: "editado com sucesso", result });
+  });
 
-  fastify.patch<{ Body: { id: string; value: string } }>(
-    "/nameWeight",
-    async (req, reply) => {
-      const result = await productServices.updateNameWeight({
-        id: req.body.id,
-        value: req.body.value,
-      });
+  fastify.patch<{
+    Body: { value: string };
+    Params: { userId: string; barbershopId: string; productId: string };
+  }>("/nameWeight", async (req, reply) => {
+    const result = await productServices.updateNameWeight({
+      id: req.params.productId,
+      value: req.body.value,
+    });
 
-      if (!result)
-        return reply
-          .code(500)
-          .send({ message: "Erro, atualização mal sucedida" });
+    if (!result)
+      return reply
+        .code(500)
+        .send({ message: "Erro, atualização mal sucedida" });
 
-      return reply.code(200).send({ messaege: "editado com sucesso", result });
-    }
-  );
+    return reply.code(200).send({ messaege: "editado com sucesso", result });
+  });
 
-  fastify.patch<{ Body: { id: string; value: number } }>(
-    "/cost",
-    async (req, reply) => {
-      const result = await productServices.updateCost({
-        id: req.body.id,
-        value: req.body.value,
-      });
+  fastify.patch<{
+    Body: { value: number };
+    Params: { userId: string; barbershopId: string; productId: string };
+  }>("/cost", async (req, reply) => {
+    const result = await productServices.updateCost({
+      id: req.params.productId,
+      value: req.body.value,
+    });
 
-      if (!result)
-        return reply
-          .code(500)
-          .send({ message: "Eroo, atualização mal sucedida" });
+    if (!result)
+      return reply
+        .code(500)
+        .send({ message: "Eroo, atualização mal sucedida" });
 
-      return reply.code(200).send({ message: "editado com sucesso", result });
-    }
-  );
+    return reply.code(200).send({ message: "editado com sucesso", result });
+  });
 
-  fastify.patch<{ Body: { id: string; value: number } }>(
-    "/price",
-    async (req, reply) => {
-      const result = await productServices.updatePrice({
-        id: req.body.id,
-        value: req.body.value,
-      });
+  fastify.patch<{
+    Body: { value: number };
+    Params: { userId: string; barbershopId: string; productId: string };
+  }>("/price", async (req, reply) => {
+    const result = await productServices.updatePrice({
+      id: req.params.productId,
+      value: req.body.value,
+    });
 
-      if (!result)
-        return reply
-          .code(500)
-          .send({ message: "Erro, atualização mal sucedida" });
+    if (!result)
+      return reply
+        .code(500)
+        .send({ message: "Erro, atualização mal sucedida" });
 
-      return reply.code(200).send({ message: "editado com sucesso", result });
-    }
-  );
+    return reply.code(200).send({ message: "editado com sucesso", result });
+  });
 
-  fastify.patch<{ Body: { id: string; value: string } }>(
-    "/describe",
-    async (req, reply) => {
-      const result = await productServices.updateDescribe({
-        id: req.body.id,
-        value: req.body.value,
-      });
+  fastify.patch<{
+    Body: { value: string };
+    Params: { userId: string; barbershopId: string; productId: string };
+  }>("/describe", async (req, reply) => {
+    const result = await productServices.updateDescribe({
+      id: req.params.productId,
+      value: req.body.value,
+    });
 
-      if (!result)
-        return reply
-          .code(500)
-          .send({ message: "Erro, atualização mal sucedida" });
+    if (!result)
+      return reply
+        .code(500)
+        .send({ message: "Erro, atualização mal sucedida" });
 
-      return reply.code(200).send({ message: "editado com sucesso", result });
-    }
-  );
+    return reply.code(200).send({ message: "editado com sucesso", result });
+  });
+
+  fastify.patch<{
+    Body: { value: boolean };
+    Params: { userId: string; barbershopId: string; productId: string };
+  }>("/worktop", async (req, reply) => {
+    const result = await productServices.updateWorktop({
+      id: req.params.productId,
+      value: req.body.value,
+    });
+
+    if (!result)
+      return reply
+        .code(500)
+        .send({ message: "Erro, atualização mal sucedida" });
+
+    return reply.code(200).send({ message: "editado com sucesso", result });
+  });
+
+  fastify.delete<{
+    Params: { userId: string; barbershopId: string; productId: string };
+  }>("/", async (req, reply) => {
+    const result = await productServices.delete(req.params.productId);
+
+    if (!result) return reply.code(500).send("Erro ao deletar");
+
+    return reply.code(200).send({ message: "Deletado com sucesso", result });
+  });
 };
 
 export const proceduresRotes = async (fastify: FastifyInstance) => {
@@ -542,19 +655,27 @@ export const proceduresRotes = async (fastify: FastifyInstance) => {
 };
 
 export const categoryRotes = async (fastify: FastifyInstance) => {
-  fastify.post("/createCatagory", (req, reply) => {
-    return reply.code(201).send("criado com sucesso");
+  fastify.patch<{
+    Params: { userId: string; barbershopId: string; categoryId: string };
+    Body: { name: string };
+  }>("/name", async (req, reply) => {
+    const result = await categoryServices.updateName({
+      id: req.params.categoryId,
+      value: req.body.name,
+    });
+
+    if (!result) reply.code(500).send("Erro ao editar categoria");
+
+    return reply.code(200).send({ message: "editado com sucesso", result });
   });
 
-  fastify.get("/", (req, reply) => {
-    return reply.code(200).send("categorias encontradas");
-  });
+  fastify.delete<{
+    Params: { userId: string; barbershopId: string; categoryId: string };
+  }>("/", async (req, reply) => {
+    const result = await categoryServices.delete(req.params.categoryId);
 
-  fastify.patch("/:id/name", (req, reply) => {
-    return reply.code(200).send("editado com sucesso");
-  });
+    if (!result) return reply.code(500).send("Erro ao deletar categoria");
 
-  fastify.delete("/:id", (req, reply) => {
     return reply.code(200).send("deletado com sucesso");
   });
 };

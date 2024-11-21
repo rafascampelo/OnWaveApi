@@ -45,6 +45,7 @@ model Barbershops {
   addressId String
   address Addresses @relation(fields: [addressId], references: [id])
   cashRegister CashRegisters?
+  categories Categories[]
   fixedExpenses FixedExpenses[]
   monthlyBalance MonthlyBalance[]
   procedures Procedures[]
@@ -67,6 +68,8 @@ model Addresses{
 model Categories {
   id String @id @default(cuid())
   name String
+  barbershopId String
+  barbershop Barbershops @relation(fields: [barbershopId], references: [id])
   products Products[]
   procedures Procedures[]
 
@@ -75,12 +78,11 @@ model Categories {
 
 model Products{
   id String @id @default(cuid())
-  userId String
   name String
-  weight String
+  weight Float
   nameWeight String
   cost Float
-  price Float
+  price Float?
   describe String?
   workTop Boolean
   stock Int

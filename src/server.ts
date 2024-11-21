@@ -43,7 +43,7 @@ server.register(proceduresRotes, {
 });
 
 server.register(categoryRotes, {
-  prefix: "/user/:userId/barbershop/:barbershopId/procedure/categories",
+  prefix: "/user/:userId/barbershop/:barbershopId/categories/:categoryId",
 });
 
 

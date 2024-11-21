@@ -1,137 +1,190 @@
 import { prisma } from "../database/prisma-client";
-import { CreateProduct, Product, ProductRepository } from "../interfaces/product";
+import {
+  CreateProductPrisma,
+  Product,
+  ProductRepository,
+} from "../interfaces/product";
 
-export class ProductRepositoryPrisma implements ProductRepository{
-    async create(data: CreateProduct): Promise<null | Product> {
-        const {barbershopId,cost,name,nameWeight,price,userId,weight,workTop,describe} = data;
+export class ProductRepositoryPrisma implements ProductRepository {
+  async create(data: CreateProductPrisma): Promise<null | Product> {
+    const {
+      barbershopId,
+      cost,
+      name,
+      nameWeight,
+      price,
+      weight,
+      workTop,
+      describe,
+      stock,
+      categoryId,
+    } = data;
 
-        return await prisma.products.create({
-            data:{
-                userId,
-                name,
-                weight,
-                nameWeight,
-                cost,
-                price,
-                describe,
-                workTop,
-                barbershopId
-            }
-        })
-    }
 
-    async getAll(): Promise<null | Product[]> {
-        return await prisma.products.findMany()
-    }
+    return await prisma.products.create({
+      data: {
+        name,
+        weight,
+        nameWeight,
+        cost,
+        price,
+        describe,
+        workTop,
+        stock,
+        barbershopId,
+        categoryId,
+      },
+    });
+  }
 
-    async getByName(name: string): Promise<null | Product[]> {
-        return await prisma.products.findMany({
-            where:{
-                name: {contains : name}
-            },
-            orderBy:{
-                name: "asc"
-            }
-        })
-    }
+  async getAll(barbershopId: string): Promise<null | Product[]> {
+    return await prisma.products.findMany({
+      where:{
+        barbershopId
+      }
+    });
+  }
 
-    async getById(id: string): Promise<null | Product> {
-        return await prisma.products.findUnique({
-            where:{
-                id
-            }
-        })
-    }
+  async getByName(data: {
+    barbershopId: string;
+    name: string;
+  }): Promise<null | Product[]> {
+    const { barbershopId, name } = data;
+    return await prisma.products.findMany({
+      where: {
+        AND: [{ barbershopId }, { name: { contains: name } }],
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
+  }
 
-    async updateName(data: {id: string ,value: string; }): Promise<null | Product> {
-        const {id, value} =data
+  async getById(id: string): Promise<null | Product> {
+    return await prisma.products.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
 
-        return await prisma.products.update({
-            where:{
-                id
-            },data:{
-                name :  value
-            }
-        })
-    }
-    
-    async updateNameWeight(data: {id: string ,value: string; }): Promise<null | Product> {
-        const {id, value} =data
+  async updateName(data: {
+    id: string;
+    value: string;
+  }): Promise<null | Product> {
+    const { id, value } = data;
 
-        return await prisma.products.update({
-            where:{
-                id
-            },data:{
-                nameWeight :  value
-            }
-        })
-    }
+    return await prisma.products.update({
+      where: {
+        id,
+      },
+      data: {
+        name: value,
+      },
+    });
+  }
 
-    async updateDescribe(data: {id: string ,value: string; }): Promise<null | Product> {
-        const {id, value} =data
+  async updateNameWeight(data: {
+    id: string;
+    value: string;
+  }): Promise<null | Product> {
+    const { id, value } = data;
 
-        return await prisma.products.update({
-            where:{
-                id
-            },data:{
-                describe :  value
-            }
-        })
-    }
+    return await prisma.products.update({
+      where: {
+        id,
+      },
+      data: {
+        nameWeight: value,
+      },
+    });
+  }
 
-    async updateWeight(data: {id: string ,value:number; }): Promise<null | Product> {
-        const {id, value} =data
+  async updateDescribe(data: {
+    id: string;
+    value: string;
+  }): Promise<null | Product> {
+    const { id, value } = data;
 
-        return await prisma.products.update({
-            where:{
-                id
-            },data:{
-                weight :  value
-            }
-        })
-    }
+    return await prisma.products.update({
+      where: {
+        id,
+      },
+      data: {
+        describe: value,
+      },
+    });
+  }
 
-    async updatePrice(data: {id: string ,value:number; }): Promise<null | Product> {
-        const {id, value} =data
+  async updateWeight(data: {
+    id: string;
+    value: number;
+  }): Promise<null | Product> {
+    const { id, value } = data;
 
-        return await prisma.products.update({
-            where:{
-                id
-            },data:{
-                price :  value
-            }
-        })
-    }
+    return await prisma.products.update({
+      where: {
+        id,
+      },
+      data: {
+        weight: value,
+      },
+    });
+  }
 
-    async updateCost(data: {id: string ,value:number; }): Promise<null | Product> {
-        const {id, value} =data
+  async updatePrice(data: {
+    id: string;
+    value: number;
+  }): Promise<null | Product> {
+    const { id, value } = data;
 
-        return await prisma.products.update({
-            where:{
-                id
-            },data:{
-                cost :  value
-            }
-        })
-    }
+    return await prisma.products.update({
+      where: {
+        id,
+      },
+      data: {
+        price: value,
+      },
+    });
+  }
 
-    async updateWorktop(data: {id: string ,value: boolean; }): Promise<null | Product> {
-        const {id, value} =data
+  async updateCost(data: {
+    id: string;
+    value: number;
+  }): Promise<null | Product> {
+    const { id, value } = data;
 
-        return await prisma.products.update({
-            where:{
-                id
-            },data:{
-                workTop :  value
-            }
-        })
-    }
+    return await prisma.products.update({
+      where: {
+        id,
+      },
+      data: {
+        cost: value,
+      },
+    });
+  }
 
-    async delete(id: string): Promise<null | Product> {
-        return await prisma.products.delete({
-            where:{
-                id
-            }
-        })
-    }
+  async updateWorktop(data: {
+    id: string;
+    value: boolean;
+  }): Promise<null | Product> {
+    const { id, value } = data;
+
+    return await prisma.products.update({
+      where: {
+        id,
+      },
+      data: {
+        workTop: value,
+      },
+    });
+  }
+
+  async delete(id: string): Promise<null | Product> {
+    return await prisma.products.delete({
+      where: {
+        id,
+      },
+    });
+  }
 }
