@@ -19,7 +19,6 @@ export class UserServices {
     console.log(data.password);
     const nuser = await this.userRepository.getByEmail(data.email);
 
-    console.log(nuser);
 
     if (!nuser) {
       console.log("oi");

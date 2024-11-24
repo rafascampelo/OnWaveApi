@@ -35,6 +35,7 @@ model Users {
   members Users[] @relation("UserAdmin")
   services Services[]
   serviceCommissions ServiceCommissions[]
+  stockMovements StockMovements[]
 
   @@map("users")
 }
@@ -103,6 +104,8 @@ model StockMovements{
   date DateTime @default(now())
   description String? 
   productId String
+  userId String
+  user Users @relation(fields: [userId],references: [id])
   product Products @relation(fields: [productId], references: [id])
 
   @@map("stockMovements")
@@ -113,9 +116,10 @@ model Procedures{
   name String
   cost Float
   price Float
-  barberShopId String
+  barbershopId String
   categoryId String
-  barbershop Barbershops @relation(fields: [barberShopId], references: [id])
+  describe String?
+  barbershop Barbershops @relation(fields: [barbershopId], references: [id])
   category Categories @relation(fields: [categoryId], references: [id])
   services ProceduresToServices[]
  

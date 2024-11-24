@@ -36,5 +36,6 @@ export interface ProductRepository {
   updatePrice(data: { id: string; value: number }): Promise<null | Product>;
   updateCost(data: { id: string; value: number }): Promise<null | Product>;
   updateWorktop(data: { id: string; value: boolean }): Promise<null | Product>;
+  updateStock(data: { id: string; value: number }): Promise<null | Product>;
   delete(id: string): Promise<null | Product>;
 }

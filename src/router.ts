@@ -8,6 +8,10 @@ import { CreateProduct, CreateProductPrisma } from "./interfaces/product";
 import { AuthMiddleware } from "./middleware/middleware";
 import { CategoryServices } from "./services/category";
 import { CreateCategory, CreateCategoryPrisma } from "./interfaces/category";
+import { CreateStockMovementBody } from "./interfaces/stock";
+import { StockMovementServices } from "./services/stock";
+import { ProcedureServices } from "./services/procedure";
+import { CreateProcedure, CreateProcedurePrisma } from "./interfaces/procedure";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -19,8 +23,9 @@ const userServices = new UserServices();
 const barbershopServices = new BarbershopServices();
 const productServices = new ProductServices();
 const categoryServices = new CategoryServices();
+const stockMovementServices = new StockMovementServices();
+const procedureServices = new ProcedureServices();
 
-// public rotes
 export const publicRotes = async (fastify: FastifyInstance) => {
   fastify.post<{ Body: Login }>("/signin", async (req, reply) => {
     const result = await userServices.sigin({
@@ -43,7 +48,6 @@ export const publicRotes = async (fastify: FastifyInstance) => {
   });
 };
 
-//rotas dev
 export const devRotes = async (fastify: FastifyInstance) => {
   //dev cria uma barbearia
   fastify.post<{ Body: CreateBarbershop }>(
@@ -206,7 +210,6 @@ export const devRotes = async (fastify: FastifyInstance) => {
   );
 };
 
-//CRUD Usuário
 export const userRotes = async (fastify: FastifyInstance) => {
   // fastify.addHook("onRequest", AuthMiddleware);
 
@@ -416,8 +419,25 @@ export const barbershopRotes = async (fastify: FastifyInstance) => {
   });
 
   //cria um procedimento
-  fastify.post("/createProcedure", (req, reply) => {
-    return reply.code(201).send("procedimento cridado com sucesso");
+  fastify.post<{
+    Body: CreateProcedure;
+    Params: { userId: string; barbershopId: string };
+  }>("/createProcedure", async (req, reply) => {
+    const data: CreateProcedurePrisma = {
+      name: req.body.name,
+      cost: req.body.cost,
+      price: req.body.price,
+      describe: req.body.describe,
+      categoryId: req.body.categoryId,
+      barbershopId: req.params.barbershopId,
+    };
+    const result = await procedureServices.create(data);
+
+    if (!result) return reply.code(500).send("Algum erro aconteceu");
+
+    return reply
+      .code(201)
+      .send({ message: "procedimento criado com sucesso", result });
   });
 
   //cria uma categoria
@@ -458,6 +478,20 @@ export const barbershopRotes = async (fastify: FastifyInstance) => {
     return reply.code(200).send({ message: "produto encontrado", result });
   });
 
+  //busca um produto
+  fastify.get<{
+    Params: { userId: string; barbershopId: string; name: string };
+  }>("/products/name/:name", async (req, reply) => {
+    const result = await productServices.find({
+      barbershopId: req.params.barbershopId,
+      name: req.params.name,
+    });
+
+    if (!result) return reply.code(500).send("Erro ao buscar produto");
+
+    return reply.code(200).send({ message: "Produtos encontrados", result });
+  });
+
   //mostra todas categorias
   fastify.get<{ Params: { userId: string; barbershopId: string } }>(
     "/categories",
@@ -475,24 +509,37 @@ export const barbershopRotes = async (fastify: FastifyInstance) => {
   );
 
   //mostra uma categoria
-    fastify.get<{
-      Params: { userId: string; barbershopId: string; categoryId: string };
-    }>("/categories/:categoryId", async (req, reply) => {
-      const result = await categoryServices.getById(req.params.categoryId);
+  fastify.get<{
+    Params: { userId: string; barbershopId: string; categoryId: string };
+  }>("/categories/:categoryId", async (req, reply) => {
+    const result = await categoryServices.getById(req.params.categoryId);
 
-      if (!result) return reply.code(404).send("nenhum produto encontrado");
-      return reply.code(200).send({ message: "produto encontrado", result });
-    });
-
+    if (!result) return reply.code(404).send("nenhum produto encontrado");
+    return reply.code(200).send({ message: "produto encontrado", result });
+  });
 
   //mostra todos os procedimentos
-  fastify.get("/process", (req, reply) => {
-    return reply.code(200).send("procedimentos encontrados");
+  fastify.get<{
+    Params: { userId: string; barbershopId: string };
+  }>("/procedure", async (req, reply) => {
+    const result = await procedureServices.getAll(req.params.barbershopId);
+
+    if (!result) return reply.code(500).send("Algum erro aconteceu");
+
+    return reply
+      .code(200)
+      .send({ message: "procedimentos encontrados", result });
   });
 
   //mostra um procedimento
-  fastify.get("/procedure/:procedureId", (req, reply) => {
-    return reply.code(200).send("procedimento encontrado");
+  fastify.get<{
+    Params: { userId: string; barbershopId: string; procedureId: string };
+  }>("/procedure/:procedureId", async (req, reply) => {
+    const result = await procedureServices.getById(req.params.procedureId);
+
+    if (!result) return reply.code(500).send("Algum erro aconteceu");
+
+    return reply.code(200).send({ message: "procedimento encontrado", result });
   });
 
   //mostra o caixa da barbearia
@@ -633,24 +680,82 @@ export const productsRotes = async (fastify: FastifyInstance) => {
 };
 
 export const proceduresRotes = async (fastify: FastifyInstance) => {
-  fastify.patch("/name", (req, reply) => {
-    return reply.code(200).send("editado com sucesso");
+  fastify.patch<{
+    Body: { value: string };
+    Params: { userId: string; barbershopId: string; productId: string };
+  }>("/name", async (req, reply) => {
+    const result = await procedureServices.updateName({
+      id: req.params.productId,
+      value: req.body.value,
+    });
+
+    if (!result)
+      return reply
+        .code(500)
+        .send({ message: "Erro, atualização mal sucedida" });
+
+    return reply.code(200).send({ message: "editado com sucesso", result });
   });
 
-  fastify.patch("/cost", (req, reply) => {
-    return reply.code(200).send("editado com sucesso");
+  fastify.patch<{
+    Body: { value: number };
+    Params: { userId: string; barbershopId: string; productId: string };
+  }>("/cost", async (req, reply) => {
+    const result = await procedureServices.updateCost({
+      id: req.params.productId,
+      value: req.body.value,
+    });
+
+    if (!result)
+      return reply
+        .code(500)
+        .send({ message: "Eroo, atualização mal sucedida" });
+
+    return reply.code(200).send({ message: "editado com sucesso", result });
   });
 
-  fastify.patch("/price", (req, reply) => {
-    return reply.code(200).send("editado com sucesso");
+  fastify.patch<{
+    Body: { value: number };
+    Params: { userId: string; barbershopId: string; productId: string };
+  }>("/price", async (req, reply) => {
+    const result = await procedureServices.updatePrice({
+      id: req.params.productId,
+      value: req.body.value,
+    });
+
+    if (!result)
+      return reply
+        .code(500)
+        .send({ message: "Erro, atualização mal sucedida" });
+
+    return reply.code(200).send({ message: "editado com sucesso", result });
   });
 
-  fastify.patch("/category", (req, reply) => {
-    return reply.code(200).send("editado com sucesso");
+  fastify.patch<{
+    Body: { value: string };
+    Params: { userId: string; barbershopId: string; productId: string };
+  }>("/describe", async (req, reply) => {
+    const result = await procedureServices.updateDescribe({
+      id: req.params.productId,
+      value: req.body.value,
+    });
+
+    if (!result)
+      return reply
+        .code(500)
+        .send({ message: "Erro, atualização mal sucedida" });
+
+    return reply.code(200).send({ message: "editado com sucesso", result });
   });
 
-  fastify.patch("/type", (req, reply) => {
-    return reply.code(200).send("editado com sucesso");
+  fastify.delete<{
+    Params: { userId: string; barbershopId: string; productId: string };
+  }>("/", async (req, reply) => {
+    const result = await procedureServices.delete(req.params.productId);
+
+    if (!result) return reply.code(500).send("Erro ao deletar");
+
+    return reply.code(200).send({ message: "Deletado com sucesso", result });
   });
 };
 
@@ -682,22 +787,63 @@ export const categoryRotes = async (fastify: FastifyInstance) => {
 
 export const stockRotes = async (fastify: FastifyInstance) => {
   //registra a entrada de estoque
-  fastify.post("/in", (req, reply) => {
-    return reply.code(201).send("entrada cadastrada com sucesso");
+  fastify.post<{
+    Body: CreateStockMovementBody;
+    Params: { userId: string; productId: string };
+  }>("/in", async (req, reply) => {
+    const result = await stockMovementServices.stockIn({
+      productId: req.params.productId,
+      quantity: req.body.quantity,
+      description: req.body.description,
+      userId: req.params.userId,
+    });
+
+    if (!result) return reply.code(500).send("Algum erro aconteceu");
+
+    return reply
+      .code(201)
+      .send({ message: "entrada cadastrada com sucesso", result });
   });
 
   //registra a saída de estoque
-  fastify.post("/out", (req, reply) => {
-    return reply.code(201).send("saída cadastrada com sucesso");
+  fastify.post<{
+    Body: CreateStockMovementBody;
+    Params: { userId: string; productId: string };
+  }>("/out", async (req, reply) => {
+    const result = await stockMovementServices.stockOut({
+      productId: req.params.productId,
+      quantity: req.body.quantity,
+      description: req.body.description,
+      userId: req.params.userId,
+    });
+
+    if (!result) return reply.code(500).send("Algum erro aconteceu");
+
+    return reply
+      .code(201)
+      .send({ message: "saida cadastrada com sucesso", result });
   });
 
-  //mostra estoque do produto
-  fastify.get("/", (req, reply) => {
-    return reply.code(200).send("estoque encontrado");
+  //mostra todas as movimentações de estoque de um produto
+  fastify.get<{ Params: { productId: string } }>("/", async (req, reply) => {
+    const result = await stockMovementServices.getAll(req.params.productId);
+
+    if (!result) return reply.code(500).send("Algum erro aconteceu");
+
+    return reply
+      .code(200)
+      .send({ message: "movimentações neste produtos", result });
   });
-  //mostra todas as movimentações de um estoque
-  fastify.get("/movements", (req, reply) => {
-    return reply.code(200).send("movimentações deste produtos");
+
+  //mostra detalhes de uma movimentação
+  fastify.get<{
+    Params: { userId: string; productId: string; stockId: string };
+  }>("/:stockId", async (req, reply) => {
+    const result = await stockMovementServices.getById(req.params.stockId);
+
+    if (!result) return reply.code(500).send("Algum erro aconteceu");
+
+    return reply.code(200).send({ message: "movimentação encontrada", result });
   });
 };
 

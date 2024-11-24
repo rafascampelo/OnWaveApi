@@ -20,7 +20,6 @@ export class ProductRepositoryPrisma implements ProductRepository {
       categoryId,
     } = data;
 
-
     return await prisma.products.create({
       data: {
         name,
@@ -39,9 +38,9 @@ export class ProductRepositoryPrisma implements ProductRepository {
 
   async getAll(barbershopId: string): Promise<null | Product[]> {
     return await prisma.products.findMany({
-      where:{
-        barbershopId
-      }
+      where: {
+        barbershopId,
+      },
     });
   }
 
@@ -176,6 +175,20 @@ export class ProductRepositoryPrisma implements ProductRepository {
       },
       data: {
         workTop: value,
+      },
+    });
+  }
+
+  async updateStock(data: {
+    id: string;
+    value: number;
+  }): Promise<null | Product> {
+    const { id, value } = data;
+
+    return await prisma.products.update({
+      where: { id },
+      data: {
+        stock: value,
       },
     });
   }

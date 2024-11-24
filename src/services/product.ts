@@ -115,6 +115,21 @@ export class ProductServices {
     return await this.productRepository.updateWorktop(data);
   }
 
+  async updateStock(data: {
+    id: string;
+    value: number;
+  }): Promise<null | Product> {
+    const { id, value } = data;
+
+    const product = await this.getById(id);
+
+    if (!product) return null;
+
+    const newValue = product.stock + value;
+
+    return await this.productRepository.updateStock({ id, value: newValue });
+  }
+
   async delete(id: string): Promise<null | Product> {
     return await this.productRepository.delete(id);
   }

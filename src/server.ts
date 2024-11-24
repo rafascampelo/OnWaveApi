@@ -39,7 +39,7 @@ server.register(productsRotes, {
 });
 
 server.register(proceduresRotes, {
-  prefix: "/user/:userId/barbershop/:barbershopId/procedure/:procedureId",
+  prefix: "/user/:userId/barbershop/:barbershopId/procedures/:procedureId",
 });
 
 server.register(categoryRotes, {
@@ -48,7 +48,7 @@ server.register(categoryRotes, {
 
 
 server.register(stockRotes, {
-  prefix: "/user/:userId/barbershop/:barbershopId/stock/:stockId",
+  prefix: "/user/:userId/products/:productId/stock/",
 });
 
 server.register(cashRotes, {
