@@ -16,6 +16,9 @@ datasource db {
 //   OUT
 // } */
 
+//  status para services 
+// DOING| DONE
+
 model Users {
   id String @id @default(cuid())
   firstname String
@@ -198,8 +201,10 @@ model Services {
   id String @id @default(cuid())
   price Float // Valor total do serviço
   date DateTime @default(now())
+  clientName String
   userId String
   barbershopId String
+  status String
   procedures ProceduresToServices[]
   products ProductsToServices[]
   user Users @relation(fields: [userId], references: [id])

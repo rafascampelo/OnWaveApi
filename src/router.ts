@@ -409,6 +409,7 @@ export const barbershopRotes = async (fastify: FastifyInstance) => {
       categoryId: req.body.categoryId,
       barbershopId: req.params.barbershopId,
     };
+
     const result = await productServices.create(data);
 
     if (!result) return reply.code(500).send("Erro ao criar produto");
@@ -672,6 +673,7 @@ export const productsRotes = async (fastify: FastifyInstance) => {
     Params: { userId: string; barbershopId: string; productId: string };
   }>("/", async (req, reply) => {
     const result = await productServices.delete(req.params.productId);
+    console.log(req.params);
 
     if (!result) return reply.code(500).send("Erro ao deletar");
 
