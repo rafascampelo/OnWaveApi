@@ -46,6 +46,19 @@ export const publicRotes = async (fastify: FastifyInstance) => {
   fastify.post("/logout", (req, reply) => {
     return reply.code(200).send("usuário deslogado");
   });
+
+  fastify.patch<{ Body: { email: string } }>(
+    "/rememberPassword",
+    async (req, reply) => {
+      const result = await userServices.rememberPassword(req.body.email);
+
+      if (!result) return reply.code(500).send("Ocorreu um erro");
+
+      return reply
+        .code(200)
+        .send({ message: "Acesso recuperado", user: result });
+    }
+  );
 };
 
 export const devRotes = async (fastify: FastifyInstance) => {

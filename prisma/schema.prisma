@@ -91,7 +91,7 @@ model Products{
   workTop Boolean
   stock Int
   barbershopId String
-  categoryId String
+  categoryId String 
   barbershop Barbershops @relation(fields: [barbershopId], references: [id])
   category Categories @relation(fields: [categoryId], references: [id]) 
   services ProductsToServices[]
@@ -109,7 +109,7 @@ model StockMovements{
   productId String
   userId String
   user Users @relation(fields: [userId],references: [id])
-  product Products @relation(fields: [productId], references: [id])
+  product Products @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("stockMovements")
 }
@@ -191,7 +191,7 @@ model ProductsToServices {
   id String @id @default(cuid())
   productId String
   serviceId String
-  product Products @relation(fields: [productId], references: [id])
+  product Products @relation(fields: [productId], references: [id], onDelete: Cascade )
   service Services @relation(fields: [serviceId], references: [id])
 
   @@map("productsToServices")

@@ -103,6 +103,22 @@ export class UserRepositoryPrisma implements UserRepository {
     });
   }
 
+  async updateFirstLogin(data: {
+    id: string;
+    value: boolean;
+  }): Promise<null | User> {
+    const { id, value } = data;
+
+    return await prisma.users.update({
+      where: {
+        id,
+      },
+      data: {
+        firstLogin: value,
+      },
+    });
+  }
+
   async updateCommissionProcedure(data: {
     id: string;
     value: number;

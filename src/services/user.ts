@@ -19,7 +19,6 @@ export class UserServices {
     console.log(data.password);
     const nuser = await this.userRepository.getByEmail(data.email);
 
-
     if (!nuser) {
       console.log("oi");
       return null;
@@ -37,7 +36,13 @@ export class UserServices {
     });
 
     const user = { ...nuser, token };
-    console.log("logado");
+
+    const firstLogin = await this.userRepository.updateFirstLogin({
+      id: user.id,
+      value: false,
+    });
+
+    if (!firstLogin) return null;
 
     return { message: "Usuário logado", user };
   }
@@ -49,6 +54,21 @@ export class UserServices {
       return true;
     }
     return false;
+  }
+
+  async rememberPassword(email: string): Promise<null | User> {
+    const user = await this.userRepository.getByEmail(email);
+
+    if (!user) return null;
+
+    const firstLogin = await this.userRepository.updateFirstLogin({
+      id: user.id,
+      value: true,
+    });
+
+    if (firstLogin) return null;
+
+    return this.updatePassword({ id: user.id, value: "0000" });
   }
 
   async create(data: CreateUser): Promise<null | User> {

@@ -42,6 +42,7 @@ export interface UserRepository {
   getByName(value: string): Promise<null | User[]>;
   getUsers(): Promise<null | User[]>;
   updateCellphone(data: { id: string; value: string }): Promise<null | User>;
+  updateFirstLogin(data: { id: string; value: boolean }): Promise<null | User>;
   updateFixedPayment(data: { id: string; value: number }): Promise<null | User>;
   updateCommissionProduct(data: {
     id: string;
