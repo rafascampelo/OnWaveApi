@@ -51,6 +51,7 @@ export const publicRotes = async (fastify: FastifyInstance) => {
     "/rememberPassword",
     async (req, reply) => {
       const result = await userServices.rememberPassword(req.body.email);
+      console.log(result);
 
       if (!result) return reply.code(500).send("Ocorreu um erro");
 

@@ -66,7 +66,7 @@ export class UserServices {
       value: true,
     });
 
-    if (firstLogin) return null;
+    if (!firstLogin) return null;
 
     return this.updatePassword({ id: user.id, value: "0000" });
   }
